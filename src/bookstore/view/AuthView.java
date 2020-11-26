@@ -36,7 +36,7 @@ public class AuthView extends JFrame {
 	private JPanel loginPanel;
 	private Panel mainPanel;
 	private Panel registerPanel;
-	HomeController home;
+	private HomeController home = new HomeController();
 	
 	void getDataUserRegister() {
 		 String username = registerUsernameField.getText();
@@ -167,8 +167,23 @@ public class AuthView extends JFrame {
 				String registerUsername = registerUsernameField.getText();
 				String registerPassword = registerPasswordField.getText();
 				String registerEmail = registerEmailField.getText();
-			
-				System.out.println(registerUsername + " " + registerPassword + " " + registerEmail);
+				
+				boolean reg = home.Register(registerUsername, registerPassword, registerEmail);
+				
+				if(reg == true) {
+					JOptionPane.showMessageDialog(btnSignup, "Register Complete !");
+					//remove Panel
+					mainPanel.removeAll();
+					mainPanel.repaint();
+					mainPanel.revalidate();
+					
+					//add panel
+					mainPanel.add(loginPanel);
+					mainPanel.repaint();
+					mainPanel.revalidate();
+				}else {
+					JOptionPane.showMessageDialog(btnSignup, "Please fill all the form");
+				}
 			}
 		});
 		btnSignup.setForeground(Color.WHITE);
@@ -235,8 +250,8 @@ public class AuthView extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				String loginUsername = loginUsernameField.getText();
 				String loginPassword = loginPasswordField.getText();
-				
-				if(loginUsername.equals("mraf") && loginPassword.equals("hihi") ) {
+				boolean login = home.Login(loginUsername, loginPassword);
+				if(login == true) {
 					dispose();
 					HomeView n = new HomeView();
 					n.setVisible(true);
