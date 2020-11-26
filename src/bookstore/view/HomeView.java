@@ -2,11 +2,18 @@ package bookstore.view;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+
+import bookstore.controller.HomeController;
+
+
 import java.awt.Color;
 import java.awt.Component;
 
@@ -15,12 +22,22 @@ import javax.swing.border.BevelBorder;
 import javax.swing.JButton;
 import java.awt.Button;
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
+import java.util.Vector;
 import java.awt.event.ActionEvent;
 import java.awt.CardLayout;
 import java.awt.Panel;
 import java.awt.Label;
 import java.awt.Font;
+import java.awt.GridLayout;
+
 import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+
+import java.awt.ScrollPane;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class HomeView extends JFrame {
 
@@ -29,6 +46,13 @@ public class HomeView extends JFrame {
 	private Panel homePanel;
 	private Panel bookPanel;
 	private Panel cartPanel;
+	private DefaultTableModel dtm;
+	private HomeController home = new HomeController();
+	Vector<Object> tHeader;
+	Vector<Object> product;
+	JTable productTable;
+	private JTextField productidTextField;
+
 	
 	/**
 	 * Launch the application.
@@ -49,6 +73,16 @@ public class HomeView extends JFrame {
 	/**
 	 * Create the frame.
 	 */
+	void getProduct() {
+		dtm = new DefaultTableModel(tHeader, 0);
+		product = home.getAllProducts();
+		Enumeration<Object> enu = product.elements();
+		while(enu.hasMoreElements()) {
+			dtm.addRow((Vector<?>) enu.nextElement());
+		}
+		productTable.setModel(dtm);
+	}
+	
 	public HomeView() {
 		setTitle("Aplikasi Bookstore");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -189,6 +223,47 @@ public class HomeView extends JFrame {
 		bookLabel.setBounds(10, 10, 125, 38);
 		bookPanel.add(bookLabel);
 		
+		Panel bookListPanel = new Panel();
+		bookListPanel.setBackground(Color.WHITE);
+		bookListPanel.setBounds(10, 50, 620, 395);
+		bookPanel.add(bookListPanel);
+		
+		tHeader = new Vector<>();
+		tHeader.add("ProductId");
+		tHeader.add("ProductName");
+		tHeader.add("ProductAuthor");
+		tHeader.add("ProductPrice");
+		tHeader.add("ProductStock");
+		dtm = new DefaultTableModel(tHeader, 0);
+		bookListPanel.setLayout(null);
+		productTable = new JTable(dtm);
+		productTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if(arg0.getSource() == productTable) fillData();
+			}
+		});
+		JScrollPane sp = new JScrollPane(productTable);
+		sp.setBounds(0, 0, 620, 298);
+		
+		
+		bookListPanel.add(sp);
+		
+		Panel addToCartPanel = new Panel();
+		addToCartPanel.setBackground(Color.GRAY);
+		addToCartPanel.setBounds(0, 304, 620, 91);
+		bookListPanel.add(addToCartPanel);
+		addToCartPanel.setLayout(null);
+		
+		Button btnAddToCart = new Button("Add To Cart");
+		btnAddToCart.setBounds(236, 48, 125, 33);
+		addToCartPanel.add(btnAddToCart);
+		
+		productidTextField = new JTextField();
+		productidTextField.setBounds(204, 11, 192, 20);
+		addToCartPanel.add(productidTextField);
+		productidTextField.setColumns(10);
+		
 		cartPanel = new Panel();
 		cartPanel.setBackground(new Color(119, 136, 153));
 		mainPanel.add(cartPanel, "name_881133832908100");
@@ -198,5 +273,18 @@ public class HomeView extends JFrame {
 		cartLabel.setFont(new Font("Arial Black", Font.BOLD, 14));
 		cartLabel.setBounds(10, 10, 183, 50);
 		cartPanel.add(cartLabel);
+		
+		getProduct();
+	}
+	
+	void mainPanelAdmin() {};
+	void mainPanelPromotionTeam() {};
+	void mainPanelManager() {};
+	
+	
+	void fillData() {
+		int idx = productTable.getSelectedRow();
+		String currentSelected = home.findIdx(idx);
+		productidTextField.setText(currentSelected);
 	}
 }

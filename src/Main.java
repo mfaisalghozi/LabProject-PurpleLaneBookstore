@@ -5,8 +5,13 @@ import bookstore.view.HomeView;
 public class Main {
 
 	public Main() {
+//		HomeView home = new HomeView();
+//		home.setVisible(true);
+		
 		AuthView auth = new AuthView();
 		auth.setVisible(true);
+		
+		
 //		DatabaseMySql n = new DatabaseMySql();
 	}
 

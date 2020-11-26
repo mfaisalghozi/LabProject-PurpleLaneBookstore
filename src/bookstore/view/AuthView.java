@@ -38,14 +38,6 @@ public class AuthView extends JFrame {
 	private Panel registerPanel;
 	private HomeController home = new HomeController();
 	
-	void getDataUserRegister() {
-		 String username = registerUsernameField.getText();
-		 String password = registerPasswordField.getText();
-		 String email = registerEmailField.getText();
-		 
-		 
-	}
-	
 	/**
 	 * Launch the application.
 	 */
