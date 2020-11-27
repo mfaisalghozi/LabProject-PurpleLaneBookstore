@@ -38,6 +38,7 @@ import javax.swing.JTextField;
 import java.awt.ScrollPane;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.table.TableModel;
 
 public class HomeView extends JFrame {
 
@@ -47,11 +48,16 @@ public class HomeView extends JFrame {
 	private Panel bookPanel;
 	private Panel cartPanel;
 	private DefaultTableModel dtm;
+	private DefaultTableModel jtm;
 	private HomeController home = new HomeController();
 	Vector<Object> tHeader;
 	Vector<Object> product;
+	Vector<Object> cart;
 	JTable productTable;
-	private JTextField productidTextField;
+	private JTextField productNameTextField;
+	private JTextField textField;
+	private JTable cartTable;
+	private JTextField quantityTextField;
 
 	
 	/**
@@ -74,6 +80,7 @@ public class HomeView extends JFrame {
 	 * Create the frame.
 	 */
 	void getProduct() {
+		product = null;
 		dtm = new DefaultTableModel(tHeader, 0);
 		product = home.getAllProducts();
 		Enumeration<Object> enu = product.elements();
@@ -81,6 +88,16 @@ public class HomeView extends JFrame {
 			dtm.addRow((Vector<?>) enu.nextElement());
 		}
 		productTable.setModel(dtm);
+	}
+	
+	void getCart() {
+		jtm = new DefaultTableModel(tHeader, 0);
+		cart = home.getAllCart();
+		Enumeration<Object> crt = cart.elements();
+		while(crt.hasMoreElements()){
+			jtm.addRow((Vector<?>) crt.nextElement());
+		}
+		cartTable.setModel(jtm);
 	}
 	
 	public HomeView() {
@@ -246,8 +263,8 @@ public class HomeView extends JFrame {
 		JScrollPane sp = new JScrollPane(productTable);
 		sp.setBounds(0, 0, 620, 298);
 		
-		
 		bookListPanel.add(sp);
+		
 		
 		Panel addToCartPanel = new Panel();
 		addToCartPanel.setBackground(Color.GRAY);
@@ -256,13 +273,48 @@ public class HomeView extends JFrame {
 		addToCartPanel.setLayout(null);
 		
 		Button btnAddToCart = new Button("Add To Cart");
+		btnAddToCart.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String productName = productNameTextField.getText();
+				String qty = quantityTextField.getText();
+				if(qty.equals("")) qty = "0";  
+					int productQty = Integer.parseInt(qty);
+				// if productQty < productQty di list jalan
+					if(home.checkQty(productName,productQty)) {
+						home.addToCart(productName, productQty);
+						getCart();
+						getProduct();
+					}else if(productQty == 0) {
+						JOptionPane.showMessageDialog(btnAddToCart, "Jumlah tidak bisa kosong atau nol :(");
+					}else {
+						JOptionPane.showMessageDialog(btnAddToCart, "Jumlah stock tidak bisa lebih banyak :(");
+					}
+			}
+		});
 		btnAddToCart.setBounds(236, 48, 125, 33);
 		addToCartPanel.add(btnAddToCart);
 		
-		productidTextField = new JTextField();
-		productidTextField.setBounds(204, 11, 192, 20);
-		addToCartPanel.add(productidTextField);
-		productidTextField.setColumns(10);
+		productNameTextField = new JTextField();
+		productNameTextField.setBounds(114, 11, 167, 20);
+		addToCartPanel.add(productNameTextField);
+		productNameTextField.setColumns(10);
+		
+		JLabel productNameLbl = new JLabel("Product Name");
+		productNameLbl.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		productNameLbl.setForeground(Color.WHITE);
+		productNameLbl.setBounds(10, 14, 94, 17);
+		addToCartPanel.add(productNameLbl);
+		
+		JLabel productQtyLbl = new JLabel("Quantity");
+		productQtyLbl.setForeground(Color.WHITE);
+		productQtyLbl.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		productQtyLbl.setBounds(331, 12, 72, 17);
+		addToCartPanel.add(productQtyLbl);
+		
+		quantityTextField = new JTextField();
+		quantityTextField.setColumns(10);
+		quantityTextField.setBounds(413, 11, 167, 20);
+		addToCartPanel.add(quantityTextField);
 		
 		cartPanel = new Panel();
 		cartPanel.setBackground(new Color(119, 136, 153));
@@ -274,6 +326,40 @@ public class HomeView extends JFrame {
 		cartLabel.setBounds(10, 10, 183, 50);
 		cartPanel.add(cartLabel);
 		
+		Panel cartListPanel = new Panel();
+		cartListPanel.setLayout(null);
+		cartListPanel.setBackground(Color.WHITE);
+		cartListPanel.setBounds(10, 59, 620, 386);
+		cartPanel.add(cartListPanel);
+		
+		Panel deleteItemPanel = new Panel();
+		deleteItemPanel.setLayout(null);
+		deleteItemPanel.setBackground(Color.GRAY);
+		deleteItemPanel.setBounds(0, 297, 620, 98);
+		cartListPanel.add(deleteItemPanel);
+		
+		Button btnDeleteItem = new Button("Delete Item");
+		btnDeleteItem.setBounds(325, 37, 125, 33);
+		deleteItemPanel.add(btnDeleteItem);
+		
+		textField = new JTextField();
+		textField.setColumns(10);
+		textField.setBounds(215, 11, 192, 20);
+		deleteItemPanel.add(textField);
+		
+		Button btnCheckout = new Button("Checkout");
+		btnCheckout.setBounds(174, 37, 125, 33);
+		deleteItemPanel.add(btnCheckout);
+		
+		jtm = new DefaultTableModel(tHeader, 0);
+		cartTable = new JTable(dtm);
+		
+		
+		JScrollPane sp_1 = new JScrollPane(cartTable);
+		sp_1.setBounds(0, 0, 620, 298);
+		cartListPanel.add(sp_1);
+		
+		
 		getProduct();
 	}
 	
@@ -284,7 +370,7 @@ public class HomeView extends JFrame {
 	
 	void fillData() {
 		int idx = productTable.getSelectedRow();
-		String currentSelected = home.findIdx(idx);
-		productidTextField.setText(currentSelected);
+		String productName = home.findIdx(idx);
+		productNameTextField.setText(productName);
 	}
 }

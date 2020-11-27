@@ -2,6 +2,7 @@ package bookstore.controller;
 
 import java.math.BigInteger;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Vector;
 
 import bookstore.database.DatabaseMySql;
@@ -16,10 +17,12 @@ public class HomeController {
 	private HomeView view;
 	DatabaseMySql con;
 	Vector<Product> products = new Vector<Product>();
-	Vector<Object> result = new Vector<Object>();
+	Vector<Object> result;
+	Vector<Object> cart = new Vector<Object>();
 	Product currentSelected;
 	
 	public Vector<Object> getAllProducts(){
+		result = new Vector<Object>();
 		ResultSet rs = con.executeQuery("SELECT * FROM products");
 		try {
 			while(rs.next()) {
@@ -31,7 +34,6 @@ public class HomeController {
 				
 				Product pd = new Product(productId, productName, productAuthor, productPrice, productStock);
 				products.add(pd);
-				System.out.println(pd.productId);
 				result.add(pd.toObjects());
 			}
 			return result;
@@ -90,6 +92,73 @@ public class HomeController {
 		currentSelected = products.get(idx);
 		return currentSelected.productName;
 	}
+
+	public void addToCart(String productNameField, int productQty) {
+		ResultSet rs = con.executeQuery("SELECT * FROM `products` WHERE `productName` LIKE '"+productNameField+"'");
+		try {
+			if(rs.next()) {
+				int productId = (int) rs.getObject(1);
+				String productName = (String) rs.getObject(2);
+				String productAuthor = (String) rs.getObject(3);
+				BigInteger productPrice = (BigInteger) rs.getObject(4);
+				int productStock = (int) rs.getObject(5);
+				productStock = productStock - productQty;
+				if(productStock == 0) {
+					deleteItem(productId);
+				}else {
+					updateItem(productId, productStock);
+				}
+				Product pd = new Product(productId, productName, productAuthor, productPrice, productQty);
+				cart.add(pd.toObjects());
+				System.out.println("Add a product success !");
+			}else {
+				System.out.println("Product incorrect or out of stock !");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}	
+	}
+	
+	public void updateItem(int productId,int productStock) {
+		String query = String.format(""
+				+ "UPDATE products "
+				+ "SET productStock = %d "
+				+ "WHERE productId = %d", productStock, productId);
+		con.executeUpdate(query);
+	}
+	
+	public void deleteItem(int productId) {
+		String query = String.format("" 
+				+ "DELETE FROM products "
+				+ "WHERE productId = '%s'", productId);
+		con.executeUpdate(query);
+	}
+	
+	public Vector<Object> getAllCart() {
+		return cart;
+	}
+
+	public boolean checkQty(String productNameField,int productQty) {
+		ResultSet rs = con.executeQuery("SELECT * FROM `products` WHERE `productName` LIKE '"+productNameField+"'");
+		try {
+			if(rs.next()) {
+				int productStock = (int) rs.getObject(5);
+				if(productQty == 0) {
+					return false;
+				}else if(productQty <= productStock) {
+					return true;
+				}else {
+					return false;
+				}
+			}else {
+				return false;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 	
 	
 	
