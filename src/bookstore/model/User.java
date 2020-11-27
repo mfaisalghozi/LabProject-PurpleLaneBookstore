@@ -1,9 +1,23 @@
 package bookstore.model;
 
-public class User {
+import java.util.Vector;
 
-	public User() {
-		// TODO Auto-generated constructor stub
+public class User {
+	
+	private String username;
+	private String password;
+	
+	public User(String loginUsername, String loginPassword) {
+		this.username = loginUsername;
+		this.password = loginPassword;
+	}
+	
+	public Vector<Object> toObject() {
+		Vector<Object> acc = new Vector<Object>();
+		acc.add(username);
+		acc.add(password);
+		
+		return acc;
 	}
 
 }

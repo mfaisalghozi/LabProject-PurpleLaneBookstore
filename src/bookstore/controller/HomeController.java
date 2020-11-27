@@ -1,11 +1,13 @@
 package bookstore.controller;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
 
 import bookstore.database.DatabaseMySql;
+import bookstore.model.Coupon;
 import bookstore.model.Product;
 import bookstore.model.User;
 import bookstore.view.AuthView;
@@ -18,7 +20,9 @@ public class HomeController {
 	DatabaseMySql con;
 	Vector<Product> products = new Vector<Product>();
 	Vector<Object> result;
+	Vector<Object> coupon;
 	Vector<Object> cart = new Vector<Object>();
+	User currentUser;
 	Product currentSelected;
 	
 	public Vector<Object> getAllProducts(){
@@ -58,6 +62,7 @@ public class HomeController {
 	}
 
 	public boolean Login(String loginUsername, String loginPassword) {
+		currentUser = new User(loginUsername, loginPassword);
 		try {
 			String sql = "SELECT * FROM `users` WHERE `userName` LIKE '"+loginUsername+"' AND `userPassword` LIKE '"+loginPassword+"'";		
 			ResultSet rs = con.executeQuery(sql);
@@ -157,6 +162,26 @@ public class HomeController {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	public Vector<Object> getAllCoupon() {
+		coupon = new Vector<Object>();
+		ResultSet rs = con.executeQuery("SELECT * FROM coupons");
+		try {
+			while(rs.next()) {
+				int couponId = (int) rs.getObject(1);
+				String couponCode = (String) rs.getObject(2);
+				Long couponDiscount = (Long) rs.getObject(3);
+				String couponNote = (String) rs.getObject(4);
+				
+				Coupon cp = new Coupon(couponId, couponCode, couponDiscount, couponNote); 
+				coupon.add(cp.toObjects());
+			}
+			return coupon;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	

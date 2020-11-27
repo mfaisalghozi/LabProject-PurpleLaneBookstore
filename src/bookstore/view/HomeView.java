@@ -49,16 +49,21 @@ public class HomeView extends JFrame {
 	private Panel cartPanel;
 	private DefaultTableModel dtm;
 	private DefaultTableModel jtm;
+	private DefaultTableModel ctm;
 	private HomeController home = new HomeController();
 	Vector<Object> tHeader;
+	Vector<Object> tHeadCoupon;
 	Vector<Object> product;
 	Vector<Object> cart;
+	Vector<Object> coupon;
 	JTable productTable;
 	private JTextField productNameTextField;
 	private JTextField textField;
 	private JTable cartTable;
 	private JTextField quantityTextField;
-
+	private Panel couponPanel;
+	private JTable couponTable;
+	
 	
 	/**
 	 * Launch the application.
@@ -98,6 +103,16 @@ public class HomeView extends JFrame {
 			jtm.addRow((Vector<?>) crt.nextElement());
 		}
 		cartTable.setModel(jtm);
+	}
+	
+	void getCoupon() {
+		ctm = new DefaultTableModel(tHeadCoupon, 0);
+		coupon = home.getAllCoupon();
+		Enumeration<Object> cp = coupon.elements();
+		while(cp.hasMoreElements()) {
+			ctm.addRow((Vector<?>) cp.nextElement());
+		}
+		couponTable.setModel(ctm);
 	}
 	
 	public HomeView() {
@@ -173,16 +188,6 @@ public class HomeView extends JFrame {
 		btnCart.setBounds(10, 250, 143, 36);
 		menuPanel.add(btnCart);
 		
-		Button btnAbout = new Button("About");
-		btnAbout.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				AboutView n = new AboutView();
-				n.setVisible(true);
-			}
-		});
-		btnAbout.setBounds(10, 304, 143, 36);
-		menuPanel.add(btnAbout);
-		
 		Button btnLogout = new Button("Logout");
 		btnLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -212,6 +217,23 @@ public class HomeView extends JFrame {
 		logo2Lbl.setBounds(58, 67, 95, 25);
 		menuPanel.add(logo2Lbl);
 		
+		Button btnCoupon = new Button("Coupon");
+		btnCoupon.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//remove Panel
+				mainPanel.removeAll();
+				mainPanel.repaint();
+				mainPanel.revalidate();
+				
+				//add panel
+				mainPanel.add(couponPanel);
+				mainPanel.repaint();
+				mainPanel.revalidate();
+			}
+		});
+		btnCoupon.setBounds(10, 303, 143, 36);
+		menuPanel.add(btnCoupon);
+		
 		mainPanel = new JPanel();
 		mainPanel.setBackground(new Color(0, 255, 255));
 		mainPanel.setBorder(new BevelBorder(BevelBorder.RAISED, new Color(255, 255, 255), new Color(255, 255, 255), new Color(255, 255, 255), new Color(255, 255, 255)));
@@ -229,6 +251,16 @@ public class HomeView extends JFrame {
 		menuLabel.setFont(new Font("Arial Black", Font.BOLD, 14));
 		menuLabel.setBounds(10, 10, 95, 45);
 		homePanel.add(menuLabel);
+		
+		Button btnAbout = new Button("About");
+		btnAbout.setBounds(242, 369, 143, 36);
+		homePanel.add(btnAbout);
+		btnAbout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AboutView n = new AboutView();
+				n.setVisible(true);
+			}
+		});
 		
 		bookPanel = new Panel();
 		bookPanel.setBackground(new Color(255, 192, 203));
@@ -280,6 +312,7 @@ public class HomeView extends JFrame {
 				if(qty.equals("")) qty = "0";  
 					int productQty = Integer.parseInt(qty);
 				// if productQty < productQty di list jalan
+		
 					if(home.checkQty(productName,productQty)) {
 						home.addToCart(productName, productQty);
 						getCart();
@@ -355,11 +388,45 @@ public class HomeView extends JFrame {
 		cartTable = new JTable(dtm);
 		
 		
-		JScrollPane sp_1 = new JScrollPane(cartTable);
-		sp_1.setBounds(0, 0, 620, 298);
-		cartListPanel.add(sp_1);
+		JScrollPane sp_cart = new JScrollPane(cartTable);
+		sp_cart.setBounds(0, 0, 620, 298);
+		cartListPanel.add(sp_cart);
 		
+		tHeadCoupon = new Vector<>();
+		tHeadCoupon.add("Coupon ID");
+		tHeadCoupon.add("Coupon Code");
+		tHeadCoupon.add("Coupon Discount");
+		tHeadCoupon.add("Coupon Note");
+		ctm = new DefaultTableModel(tHeadCoupon, 0);
+		couponTable = new JTable(ctm);
 		
+		couponPanel = new Panel();
+		couponPanel.setLayout(null);
+		couponPanel.setBackground(Color.ORANGE);
+		mainPanel.add(couponPanel, "name_97394224460200");
+		
+		Label couponLabel = new Label("Available Coupon");
+		couponLabel.setFont(new Font("Arial Black", Font.BOLD, 14));
+		couponLabel.setBounds(10, 10, 183, 50);
+		couponPanel.add(couponLabel);
+		
+		Panel couponListPanel = new Panel();
+		couponListPanel.setLayout(null);
+		couponListPanel.setBackground(Color.WHITE);
+		couponListPanel.setBounds(10, 59, 620, 386);
+		couponPanel.add(couponListPanel);
+		
+		Panel couponSettingPanel = new Panel();
+		couponSettingPanel.setLayout(null);
+		couponSettingPanel.setBackground(Color.GRAY);
+		couponSettingPanel.setBounds(0, 297, 620, 98);
+		couponListPanel.add(couponSettingPanel);
+		
+		JScrollPane sp_coupon = new JScrollPane(couponTable);
+		sp_coupon.setBounds(0, 0, 620, 301);
+		couponListPanel.add(sp_coupon);
+		
+		getCoupon();
 		getProduct();
 	}
 	
