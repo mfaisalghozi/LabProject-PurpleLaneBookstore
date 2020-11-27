@@ -63,7 +63,7 @@ public class HomeView extends JFrame {
 	private JTextField quantityTextField;
 	private Panel couponPanel;
 	private JTable couponTable;
-	
+	private Panel transHistoryPanel;
 	
 	/**
 	 * Launch the application.
@@ -116,6 +116,23 @@ public class HomeView extends JFrame {
 	}
 	
 	public HomeView() {
+		defaultView();
+	}
+	
+	void mainPanelAdmin() {
+		
+	};
+	void mainPanelPromotionTeam() {};
+	void mainPanelManager() {};
+	
+	
+	void fillData() {
+		int idx = productTable.getSelectedRow();
+		String productName = home.findIdx(idx);
+		productNameTextField.setText(productName);
+	}
+	
+	void defaultView() {
 		setTitle("Aplikasi Bookstore");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 860, 516);
@@ -148,7 +165,7 @@ public class HomeView extends JFrame {
 				
 			}
 		});
-		btnHome.setBounds(10, 140, 143, 36);
+		btnHome.setBounds(10, 111, 143, 36);
 		menuPanel.add(btnHome);
 		
 		Button btnBook = new Button("Books");
@@ -168,7 +185,7 @@ public class HomeView extends JFrame {
 				
 			}
 		});
-		btnBook.setBounds(10, 198, 143, 36);
+		btnBook.setBounds(10, 165, 143, 36);
 		menuPanel.add(btnBook);
 		
 		Button btnCart = new Button("Cart");
@@ -185,7 +202,7 @@ public class HomeView extends JFrame {
 				mainPanel.revalidate();
 			}
 		});
-		btnCart.setBounds(10, 250, 143, 36);
+		btnCart.setBounds(10, 216, 143, 36);
 		menuPanel.add(btnCart);
 		
 		Button btnLogout = new Button("Logout");
@@ -204,17 +221,17 @@ public class HomeView extends JFrame {
 				}
 			}
 		});
-		btnLogout.setBounds(10, 358, 143, 36);
+		btnLogout.setBounds(10, 377, 143, 36);
 		menuPanel.add(btnLogout);
 		
 		JLabel logo1Lbl = new JLabel("PurpleLane");
 		logo1Lbl.setFont(new Font("Century", Font.ITALIC, 20));
-		logo1Lbl.setBounds(10, 25, 115, 50);
+		logo1Lbl.setBounds(10, 0, 115, 50);
 		menuPanel.add(logo1Lbl);
 		
 		JLabel logo2Lbl = new JLabel("Bookstore");
 		logo2Lbl.setFont(new Font("Century", Font.ITALIC, 20));
-		logo2Lbl.setBounds(58, 67, 95, 25);
+		logo2Lbl.setBounds(58, 36, 95, 25);
 		menuPanel.add(logo2Lbl);
 		
 		Button btnCoupon = new Button("Coupon");
@@ -231,8 +248,25 @@ public class HomeView extends JFrame {
 				mainPanel.revalidate();
 			}
 		});
-		btnCoupon.setBounds(10, 303, 143, 36);
+		btnCoupon.setBounds(10, 270, 143, 36);
 		menuPanel.add(btnCoupon);
+		
+		Button btnTransactionHistory = new Button("Transaction History");
+		btnTransactionHistory.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//remove Panel
+				mainPanel.removeAll();
+				mainPanel.repaint();
+				mainPanel.revalidate();
+				
+				//add panel
+				mainPanel.add(transHistoryPanel);
+				mainPanel.repaint();
+				mainPanel.revalidate();
+			}
+		});
+		btnTransactionHistory.setBounds(10, 323, 143, 36);
+		menuPanel.add(btnTransactionHistory);
 		
 		mainPanel = new JPanel();
 		mainPanel.setBackground(new Color(0, 255, 255));
@@ -426,18 +460,33 @@ public class HomeView extends JFrame {
 		sp_coupon.setBounds(0, 0, 620, 301);
 		couponListPanel.add(sp_coupon);
 		
+		transHistoryPanel = new Panel();
+		transHistoryPanel.setLayout(null);
+		transHistoryPanel.setBackground(Color.CYAN);
+		mainPanel.add(transHistoryPanel, "name_133508683103399");
+		
+		Label transLabel = new Label("Transaction History");
+		transLabel.setFont(new Font("Arial Black", Font.BOLD, 14));
+		transLabel.setBounds(10, 10, 183, 50);
+		transHistoryPanel.add(transLabel);
+		
+		Panel historyListPanel = new Panel();
+		historyListPanel.setLayout(null);
+		historyListPanel.setBackground(Color.WHITE);
+		historyListPanel.setBounds(10, 59, 620, 386);
+		transHistoryPanel.add(historyListPanel);
+		
+		Panel historySettingPanel = new Panel();
+		historySettingPanel.setLayout(null);
+		historySettingPanel.setBackground(Color.PINK);
+		historySettingPanel.setBounds(0, 297, 620, 98);
+		historyListPanel.add(historySettingPanel);
+		
+		JScrollPane sp_transactionHistory = new JScrollPane((Component) null);
+		sp_transactionHistory.setBounds(0, 0, 620, 301);
+		historyListPanel.add(sp_transactionHistory);
+		
 		getCoupon();
 		getProduct();
-	}
-	
-	void mainPanelAdmin() {};
-	void mainPanelPromotionTeam() {};
-	void mainPanelManager() {};
-	
-	
-	void fillData() {
-		int idx = productTable.getSelectedRow();
-		String productName = home.findIdx(idx);
-		productNameTextField.setText(productName);
 	}
 }
