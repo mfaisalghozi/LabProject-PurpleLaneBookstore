@@ -245,6 +245,11 @@ public class AuthView extends JFrame {
 				boolean login = home.Login(loginUsername, loginPassword);
 				if(login == true) {
 					dispose();
+					//if userRoleId == 1  => adminHomeView()
+					//else if userRoleId == 2 => promotionHomeView()
+					//else if userRoleId == 3 => managerHomeView()
+					//else => HomeView()
+					
 					HomeView n = new HomeView();
 					n.setVisible(true);
 					JOptionPane.showMessageDialog(btnLogin, "You have successfully Logged in");

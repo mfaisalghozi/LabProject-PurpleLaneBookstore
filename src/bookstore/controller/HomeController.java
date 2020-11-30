@@ -21,9 +21,10 @@ public class HomeController {
 	Vector<Product> products = new Vector<Product>();
 	Vector<Object> result;
 	Vector<Object> coupon;
-	Vector<Object> cart = new Vector<Object>();
+	Vector<Object> carts = new Vector<Object>();
 	User currentUser;
 	Product currentSelected;
+	Coupon currentCoupon;
 	
 	public Vector<Object> getAllProducts(){
 		result = new Vector<Object>();
@@ -114,7 +115,7 @@ public class HomeController {
 					updateItem(productId, productStock);
 				}
 				Product pd = new Product(productId, productName, productAuthor, productPrice, productQty);
-				cart.add(pd.toObjects());
+				carts.add(pd.toObjects());
 				System.out.println("Add a product success !");
 			}else {
 				System.out.println("Product incorrect or out of stock !");
@@ -140,7 +141,7 @@ public class HomeController {
 	}
 	
 	public Vector<Object> getAllCart() {
-		return cart;
+		return carts;
 	}
 
 	public boolean checkQty(String productNameField,int productQty) {
@@ -182,6 +183,38 @@ public class HomeController {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public boolean deleteCart(int idx) {
+		try {
+			carts.remove(idx);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public boolean useCoupon(String couponCodeText) {
+		ResultSet rs = con.executeQuery("SELECT * FROM `coupons` WHERE `couponCode` LIKE '"+couponCodeText+"'");
+		try {
+			if(rs.next()) {
+				int couponId = (int) rs.getObject(1);
+				String couponCode = (String) rs.getObject(2);
+				Long couponDiscount = (Long) rs.getObject(3);
+				String couponNote = (String) rs.getObject(4);
+	
+				currentCoupon = new Coupon(couponId, couponCode, couponDiscount, couponNote);
+				System.out.println("Use Coupon Success !");
+				return true;
+			}else {
+				System.out.println("Coupon is invalide");
+				return false;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}	
 	}
 
 	

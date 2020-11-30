@@ -58,13 +58,14 @@ public class HomeView extends JFrame {
 	Vector<Object> coupon;
 	JTable productTable;
 	private JTextField productNameTextField;
-	private JTextField textField;
+	private JTextField cartTextField;
 	private JTable cartTable;
 	private JTextField quantityTextField;
 	private Panel couponPanel;
 	private JTable couponTable;
 	private Panel transHistoryPanel;
-	
+	private int idCartChoose;
+	private JTextField couponTextField;
 	/**
 	 * Launch the application.
 	 */
@@ -131,6 +132,20 @@ public class HomeView extends JFrame {
 		String productName = home.findIdx(idx);
 		productNameTextField.setText(productName);
 	}
+	
+	void fillCart() {
+		int idx = cartTable.getSelectedRow();
+		idCartChoose = idx;
+		Vector<String> cartObj = (Vector<String>) cart.get(idx);
+		cartTextField.setText(cartObj.get(1));
+	}
+	
+	void fillCoupon() {
+		int idx = couponTable.getSelectedRow();
+		Vector<String> couponObj = (Vector<String>) coupon.get(idx);
+		couponTextField.setText(couponObj.get(1));
+	}
+	
 	
 	void defaultView() {
 		setTitle("Aplikasi Bookstore");
@@ -349,6 +364,8 @@ public class HomeView extends JFrame {
 		
 					if(home.checkQty(productName,productQty)) {
 						home.addToCart(productName, productQty);
+						productNameTextField.setText("");
+						quantityTextField.setText("");
 						getCart();
 						getProduct();
 					}else if(productQty == 0) {
@@ -406,13 +423,26 @@ public class HomeView extends JFrame {
 		cartListPanel.add(deleteItemPanel);
 		
 		Button btnDeleteItem = new Button("Delete Item");
+		btnDeleteItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean delete = home.deleteCart(idCartChoose);
+				if(delete == true) {
+					JOptionPane.showMessageDialog(btnDeleteItem, "Delete item from cart success !");
+					cartTextField.setText("");
+					getCart();
+				}else {
+					JOptionPane.showMessageDialog(btnDeleteItem, "No Item right there :(");
+				}
+				
+			}
+		});
 		btnDeleteItem.setBounds(325, 37, 125, 33);
 		deleteItemPanel.add(btnDeleteItem);
 		
-		textField = new JTextField();
-		textField.setColumns(10);
-		textField.setBounds(215, 11, 192, 20);
-		deleteItemPanel.add(textField);
+		cartTextField = new JTextField();
+		cartTextField.setColumns(10);
+		cartTextField.setBounds(215, 11, 192, 20);
+		deleteItemPanel.add(cartTextField);
 		
 		Button btnCheckout = new Button("Checkout");
 		btnCheckout.setBounds(174, 37, 125, 33);
@@ -420,6 +450,12 @@ public class HomeView extends JFrame {
 		
 		jtm = new DefaultTableModel(tHeader, 0);
 		cartTable = new JTable(dtm);
+		cartTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if(arg0.getSource() == cartTable) fillCart();
+			}
+		});
 		
 		
 		JScrollPane sp_cart = new JScrollPane(cartTable);
@@ -433,6 +469,12 @@ public class HomeView extends JFrame {
 		tHeadCoupon.add("Coupon Note");
 		ctm = new DefaultTableModel(tHeadCoupon, 0);
 		couponTable = new JTable(ctm);
+		couponTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if(arg0.getSource() == couponTable) fillCoupon();
+			}
+		});
 		
 		couponPanel = new Panel();
 		couponPanel.setLayout(null);
@@ -455,6 +497,27 @@ public class HomeView extends JFrame {
 		couponSettingPanel.setBackground(Color.GRAY);
 		couponSettingPanel.setBounds(0, 297, 620, 98);
 		couponListPanel.add(couponSettingPanel);
+		
+		Button btnUseCoupon = new Button("Use Coupon");
+		btnUseCoupon.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String couponCode = couponTextField.getText();
+				boolean useCoupon = home.useCoupon(couponCode);
+				if(useCoupon == true) {
+					JOptionPane.showMessageDialog(btnUseCoupon, "Use coupon successfull !");
+					couponTextField.setText("");
+				}else {
+					JOptionPane.showMessageDialog(btnUseCoupon, "Use coupon failed !");
+				}
+			}
+		});
+		btnUseCoupon.setBounds(230, 46, 140, 28);
+		couponSettingPanel.add(btnUseCoupon);
+		
+		couponTextField = new JTextField();
+		couponTextField.setBounds(230, 11, 140, 20);
+		couponSettingPanel.add(couponTextField);
+		couponTextField.setColumns(10);
 		
 		JScrollPane sp_coupon = new JScrollPane(couponTable);
 		sp_coupon.setBounds(0, 0, 620, 301);

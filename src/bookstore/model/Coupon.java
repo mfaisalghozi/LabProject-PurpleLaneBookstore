@@ -11,11 +11,11 @@ public class Coupon {
 	Long couponDiscount;
 	String couponNote;
 	
-	public Coupon(int couponId, String couponCode, Long couponDiscount2, String couponNote) {
+	public Coupon(int couponId, String couponCode, Long couponDiscount, String couponNote) {
 		super();
 		this.couponId = couponId;
 		this.couponCode = couponCode;
-		this.couponDiscount = couponDiscount2;
+		this.couponDiscount = couponDiscount;
 		this.couponNote = couponNote;
 	}
 	
