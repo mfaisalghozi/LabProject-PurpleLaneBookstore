@@ -445,6 +445,19 @@ public class HomeView extends JFrame {
 		deleteItemPanel.add(cartTextField);
 		
 		Button btnCheckout = new Button("Checkout");
+		btnCheckout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//Create Transaction 
+				boolean transaction = home.createTransaction();
+				if(transaction == true) {
+					//if success checkout success
+					System.out.println("Checkout Success !");
+				}else {
+					//else checkout failed
+				}
+				
+			}
+		});
 		btnCheckout.setBounds(174, 37, 125, 33);
 		deleteItemPanel.add(btnCheckout);
 		
@@ -506,8 +519,11 @@ public class HomeView extends JFrame {
 				if(useCoupon == true) {
 					JOptionPane.showMessageDialog(btnUseCoupon, "Use coupon successfull !");
 					couponTextField.setText("");
+					//DELETE USED COUPON
+					
 				}else {
-					JOptionPane.showMessageDialog(btnUseCoupon, "Use coupon failed !");
+					JOptionPane.showMessageDialog(btnUseCoupon, "Use coupon failed or you already use a coupon!");
+					couponTextField.setText("");
 				}
 			}
 		});

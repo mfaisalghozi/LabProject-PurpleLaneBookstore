@@ -22,9 +22,9 @@ public class HomeController {
 	Vector<Object> result;
 	Vector<Object> coupon;
 	Vector<Object> carts = new Vector<Object>();
-	User currentUser;
 	Product currentSelected;
 	Coupon currentCoupon;
+	User currentUser;
 	
 	public Vector<Object> getAllProducts(){
 		result = new Vector<Object>();
@@ -63,13 +63,14 @@ public class HomeController {
 	}
 
 	public boolean Login(String loginUsername, String loginPassword) {
-		currentUser = new User(loginUsername, loginPassword);
 		try {
 			String sql = "SELECT * FROM `users` WHERE `userName` LIKE '"+loginUsername+"' AND `userPassword` LIKE '"+loginPassword+"'";		
 			ResultSet rs = con.executeQuery(sql);
 			if(rs.next()){
                 if(loginUsername.equals(rs.getString("userName")) && loginPassword.equals(rs.getString("userPassword"))){             
-                    return true;
+                	currentUser = new User(loginUsername, loginPassword);
+                	System.out.println(currentUser);
+                	return true;
                 }
             }else{  	
             		return false;
@@ -196,25 +197,52 @@ public class HomeController {
 	}
 
 	public boolean useCoupon(String couponCodeText) {
-		ResultSet rs = con.executeQuery("SELECT * FROM `coupons` WHERE `couponCode` LIKE '"+couponCodeText+"'");
-		try {
-			if(rs.next()) {
-				int couponId = (int) rs.getObject(1);
-				String couponCode = (String) rs.getObject(2);
-				Long couponDiscount = (Long) rs.getObject(3);
-				String couponNote = (String) rs.getObject(4);
-	
-				currentCoupon = new Coupon(couponId, couponCode, couponDiscount, couponNote);
-				System.out.println("Use Coupon Success !");
-				return true;
-			}else {
-				System.out.println("Coupon is invalide");
+		if(currentCoupon == null) {
+			ResultSet rs = con.executeQuery("SELECT * FROM `coupons` WHERE `couponCode` LIKE '"+couponCodeText+"'");
+			try {
+				if(rs.next()) {
+					int couponId = (int) rs.getObject(1);
+					String couponCode = (String) rs.getObject(2);
+					Long couponDiscount = (Long) rs.getObject(3);
+					String couponNote = (String) rs.getObject(4);
+		
+					currentCoupon = new Coupon(couponId, couponCode, couponDiscount, couponNote);
+					System.out.println("Use Coupon Success !");
+					return true;
+				}else {
+					System.out.println("Coupon is invalide");
+					return false;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
 				return false;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+			}	
+		}
+		else {
 			return false;
-		}	
+		}
+		
+	}
+
+	public boolean createTransaction() {
+//		insertTransasction 
+//		int userId;
+//		int productId;
+//		int couponId;
+//		int transactionQty;
+//		String transactionType;
+//		Long transactionCardNumb;
+//		
+//		String query = String.format(""
+//				+"INSERT INTO transactions VALUES "
+//				+"()");
+//		con.executeUpdate(query);
+		System.out.println(currentUser);
+		System.out.println(currentCoupon);
+		
+		
+		
+		return true;
 	}
 
 	

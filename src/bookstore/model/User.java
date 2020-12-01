@@ -4,8 +4,8 @@ import java.util.Vector;
 
 public class User {
 	
-	private String username;
-	private String password;
+	String username;
+	String password;
 	
 	public User(String loginUsername, String loginPassword) {
 		this.username = loginUsername;
