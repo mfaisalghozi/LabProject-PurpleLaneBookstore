@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 
+import bookstore.controller.AuthController;
 import bookstore.controller.HomeController;
 import bookstore.model.User;
 
@@ -36,7 +37,7 @@ public class AuthView extends JFrame {
 	private JPanel loginPanel;
 	private Panel mainPanel;
 	private Panel registerPanel;
-	private HomeController home = new HomeController();
+	private AuthController auth = new AuthController();
 	
 	/**
 	 * Launch the application.
@@ -160,7 +161,7 @@ public class AuthView extends JFrame {
 				String registerPassword = registerPasswordField.getText();
 				String registerEmail = registerEmailField.getText();
 				
-				boolean reg = home.Register(registerUsername, registerPassword, registerEmail);
+				boolean reg = auth.Register(registerUsername, registerPassword, registerEmail);
 				
 				if(reg == true) {
 					JOptionPane.showMessageDialog(btnSignup, "Register Complete !");
@@ -242,16 +243,21 @@ public class AuthView extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				String loginUsername = loginUsernameField.getText();
 				String loginPassword = loginPasswordField.getText();
-				boolean login = home.Login(loginUsername, loginPassword);
+				boolean login = auth.Login(loginUsername, loginPassword);
+				int userId = auth.getUserId(loginUsername, loginPassword);
+				int roleId = auth.getRoleId(loginUsername, loginPassword);
 				if(login == true) {
 					dispose();
 					//if userRoleId == 1  => adminHomeView()
 					//else if userRoleId == 2 => promotionHomeView()
 					//else if userRoleId == 3 => managerHomeView()
 					//else => HomeView()
+	
+					if(roleId == 4) {
+						HomeView n = new HomeView(userId,loginUsername, loginPassword);
+						n.setVisible(true);
+					}
 					
-					HomeView n = new HomeView();
-					n.setVisible(true);
 					JOptionPane.showMessageDialog(btnLogin, "You have successfully Logged in");
 				}else {
 					JOptionPane.showMessageDialog(btnLogin, "Wrong Password or Username");

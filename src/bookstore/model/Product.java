@@ -7,9 +7,9 @@ public class Product {
 	
 	public int productId;
 	public String productName;
-	private String productAuthor;
-	private BigInteger productPrice;
-	private int productStock;
+	public String productAuthor;
+	public BigInteger productPrice;
+	public int productStock;
 	
 	public Product(int productId, String productName, String productAuthor, BigInteger productPrice, int productStock) {
 		super();

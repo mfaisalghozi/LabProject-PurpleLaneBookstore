@@ -6,10 +6,10 @@ import java.util.Vector;
 
 public class Coupon {
 	
-	int couponId;
-	String couponCode;
-	Long couponDiscount;
-	String couponNote;
+	public int couponId;
+	public String couponCode;
+	public Long couponDiscount;
+	public String couponNote;
 	
 	public Coupon(int couponId, String couponCode, Long couponDiscount, String couponNote) {
 		super();

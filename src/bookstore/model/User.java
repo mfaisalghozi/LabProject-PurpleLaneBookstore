@@ -4,10 +4,12 @@ import java.util.Vector;
 
 public class User {
 	
-	String username;
-	String password;
+	public int userId;
+	public String username;
+	public String password;
 	
-	public User(String loginUsername, String loginPassword) {
+	public User(int userId, String loginUsername, String loginPassword) {
+		this.userId = userId;
 		this.username = loginUsername;
 		this.password = loginPassword;
 	}

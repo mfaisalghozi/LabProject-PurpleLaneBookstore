@@ -50,12 +50,18 @@ public class HomeView extends JFrame {
 	private DefaultTableModel dtm;
 	private DefaultTableModel jtm;
 	private DefaultTableModel ctm;
-	private HomeController home = new HomeController();
+	private DefaultTableModel ttm;
+	private static String username;
+	private static String password;
+	private static int userId;
+	private HomeController home;
 	Vector<Object> tHeader;
 	Vector<Object> tHeadCoupon;
+	Vector<Object> tHeadTransaction;
 	Vector<Object> product;
 	Vector<Object> cart;
 	Vector<Object> coupon;
+	Vector<Object> transaction;
 	JTable productTable;
 	private JTextField productNameTextField;
 	private JTextField cartTextField;
@@ -63,6 +69,7 @@ public class HomeView extends JFrame {
 	private JTextField quantityTextField;
 	private Panel couponPanel;
 	private JTable couponTable;
+	private JTable transactionTable;
 	private Panel transHistoryPanel;
 	private int idCartChoose;
 	private JTextField couponTextField;
@@ -73,7 +80,7 @@ public class HomeView extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					HomeView frame = new HomeView();
+					HomeView frame = new HomeView(userId, username, password);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -116,7 +123,21 @@ public class HomeView extends JFrame {
 		couponTable.setModel(ctm);
 	}
 	
-	public HomeView() {
+	void getTransaction() {
+		ttm = new DefaultTableModel(tHeadTransaction, 0);
+		transaction = home.getAllTransaction(userId);
+		Enumeration<Object> ts = transaction.elements();
+		while(ts.hasMoreElements()) {
+			ttm.addRow((Vector<?>) ts.nextElement());
+		}
+		transactionTable.setModel(ttm);
+	}
+	
+	public HomeView(int userId, String username, String password) {
+		this.userId = userId;
+		this.username = username;
+		this.password = password;
+		home = new HomeController(userId, username, password);
 		defaultView();
 	}
 	
@@ -145,7 +166,7 @@ public class HomeView extends JFrame {
 		Vector<String> couponObj = (Vector<String>) coupon.get(idx);
 		couponTextField.setText(couponObj.get(1));
 	}
-	
+		
 	
 	void defaultView() {
 		setTitle("Aplikasi Bookstore");
@@ -448,13 +469,17 @@ public class HomeView extends JFrame {
 		btnCheckout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//Create Transaction 
-				boolean transaction = home.createTransaction();
-				if(transaction == true) {
-					//if success checkout success
-					System.out.println("Checkout Success !");
-				}else {
-					//else checkout failed
-				}
+				System.out.println(idCartChoose);
+					boolean transaction = home.createTransaction(idCartChoose);
+					if(transaction == true) {
+						//if success checkout success
+						System.out.println("Checkout Success !");
+						JOptionPane.showMessageDialog(btnCheckout, "Checkout Success ! Happy Shopping !");
+					}else {
+						System.out.println("Checkout Failed");
+						JOptionPane.showMessageDialog(btnCheckout, "Your cart is empty please fill cart first !");
+					}
+	
 				
 			}
 		});
@@ -539,6 +564,7 @@ public class HomeView extends JFrame {
 		sp_coupon.setBounds(0, 0, 620, 301);
 		couponListPanel.add(sp_coupon);
 		
+		
 		transHistoryPanel = new Panel();
 		transHistoryPanel.setLayout(null);
 		transHistoryPanel.setBackground(Color.CYAN);
@@ -560,12 +586,24 @@ public class HomeView extends JFrame {
 		historySettingPanel.setBackground(Color.PINK);
 		historySettingPanel.setBounds(0, 297, 620, 98);
 		historyListPanel.add(historySettingPanel);
+			
 		
-		JScrollPane sp_transactionHistory = new JScrollPane((Component) null);
+		
+		tHeadTransaction = new Vector<>();
+		tHeadTransaction.add("productId");
+		tHeadTransaction.add("transactionId");
+		tHeadTransaction.add("transactionQty");
+		tHeadTransaction.add("transactionType");
+		tHeadTransaction.add("Card Number");
+		ttm = new DefaultTableModel(tHeadTransaction, 0);
+		transactionTable = new JTable(ttm);
+		
+		JScrollPane sp_transactionHistory = new JScrollPane(transactionTable);
 		sp_transactionHistory.setBounds(0, 0, 620, 301);
 		historyListPanel.add(sp_transactionHistory);
 		
 		getCoupon();
 		getProduct();
+		getTransaction();
 	}
 }

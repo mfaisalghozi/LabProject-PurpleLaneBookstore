@@ -4,14 +4,21 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Enumeration;
 import java.util.Vector;
+
+import javax.swing.table.DefaultTableModel;
+
+import java.sql.Date;
 
 import bookstore.database.DatabaseMySql;
 import bookstore.model.Coupon;
 import bookstore.model.Product;
+import bookstore.model.Transaction;
 import bookstore.model.User;
 import bookstore.view.AuthView;
 import bookstore.view.HomeView;
+
 
 public class HomeController {
 	
@@ -20,11 +27,38 @@ public class HomeController {
 	DatabaseMySql con;
 	Vector<Product> products = new Vector<Product>();
 	Vector<Object> result;
+	Vector<Transaction> trans = new Vector<Transaction>();
+	Vector<Object> transResult;
 	Vector<Object> coupon;
+	Vector<Product> cartCheckout = new Vector<Product>();
 	Vector<Object> carts = new Vector<Object>();
 	Product currentSelected;
+	Product currentCart;
 	Coupon currentCoupon;
 	User currentUser;
+	
+	public Vector<Object> getAllTransaction(int userId) {
+		transResult = new Vector<Object>();
+		ResultSet rs = con.executeQuery("SELECT * FROM transactions WHERE userId = " + userId);
+		try {
+			while(rs.next()) {
+				int productId = (int) rs.getObject(2);
+				int transactionId = (int) rs.getObject(4);
+				int transactionQty = (int) rs.getObject(6);
+				String transactionType = (String) rs.getObject(7);
+				Long transactionCardNumb = (Long) rs.getObject(8);
+				
+				Transaction ts = new Transaction(productId, transactionId, transactionQty, transactionType, transactionCardNumb);
+				trans.add(ts);
+				transResult.add(ts.toObjects());
+			}
+			return transResult;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	
 	public Vector<Object> getAllProducts(){
 		result = new Vector<Object>();
@@ -48,7 +82,8 @@ public class HomeController {
 		return null;
 	}
 	
-	public HomeController() {
+	public HomeController(int userId, String username, String password) {
+		currentUser = new User(userId, username, password);
 		con = DatabaseMySql.getInstance();
 	}
 		
@@ -57,43 +92,11 @@ public class HomeController {
 		auth.setVisible(true);
 	}
 	
-	public void viewHomePage() {
-		HomeView home = new HomeView();
-		home.setVisible(true);
-	}
-
-	public boolean Login(String loginUsername, String loginPassword) {
-		try {
-			String sql = "SELECT * FROM `users` WHERE `userName` LIKE '"+loginUsername+"' AND `userPassword` LIKE '"+loginPassword+"'";		
-			ResultSet rs = con.executeQuery(sql);
-			if(rs.next()){
-                if(loginUsername.equals(rs.getString("userName")) && loginPassword.equals(rs.getString("userPassword"))){             
-                	currentUser = new User(loginUsername, loginPassword);
-                	System.out.println(currentUser);
-                	return true;
-                }
-            }else{  	
-            		return false;
-                }
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-		return false;
-	}
+//	public void viewHomePage() {
+//		HomeView home = new HomeView();
+//		home.setVisible(true);
+//	}
 	
-	public boolean Register(String regUsername, String regPassword, String regEmail) {
-		try {
-			String query = String.format("" 
-					+ "INSERT INTO `users` (`userId`, `userName`, `userPassword`, `userRoleId`) "
-					+ "VALUES (NULL, '%s', '%s', '4');", regUsername, regPassword);
-			con.executeUpdate(query);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
 
 	public String findIdx(int idx) {
 		currentSelected = products.get(idx);
@@ -116,6 +119,7 @@ public class HomeController {
 					updateItem(productId, productStock);
 				}
 				Product pd = new Product(productId, productName, productAuthor, productPrice, productQty);
+				cartCheckout.add(pd);
 				carts.add(pd.toObjects());
 				System.out.println("Add a product success !");
 			}else {
@@ -188,6 +192,8 @@ public class HomeController {
 
 	public boolean deleteCart(int idx) {
 		try {
+			//remove in cartCheckout too bro !
+			cartCheckout.remove(idx);
 			carts.remove(idx);
 			return true;
 		} catch (Exception e) {
@@ -224,25 +230,54 @@ public class HomeController {
 		
 	}
 
-	public boolean createTransaction() {
-//		insertTransasction 
-//		int userId;
-//		int productId;
-//		int couponId;
-//		int transactionQty;
-//		String transactionType;
-//		Long transactionCardNumb;
-//		
-//		String query = String.format(""
-//				+"INSERT INTO transactions VALUES "
-//				+"()");
-//		con.executeUpdate(query);
-		System.out.println(currentUser);
-		System.out.println(currentCoupon);
+	public boolean createTransaction(int idx) {
+		
+		//FLOW
+		//0. check if there is a product in cart, if no reject it
+		//1. User Checkout (Only Selected Product WIll Be CheckOut)
+		//2. Create transaction by inserting to db all product in cart and create per collumn
+		//3. Deleting cart list, and refresh the page
+		//4. send success notification
+		
+//		public void insert() {
+//			Product pd = getData();
+//			String query = String.format("" 
+//					+ "INSERT INTO products VALUES " 
+//					+ "('%s', '%s', %d)", pd.productId, pd.productName, pd.productPrice);
+//			con.executeUpdate(query);
+//			getAllProducts();
+//		}
+		
+//		public String findIdx(int idx) {
+//			currentSelected = products.get(idx);
+//			return currentSelected.productName;
+//		}
 		
 		
+		if(carts.isEmpty() == false) {			
+			currentCart = cartCheckout.get(idx);
+			
+			int userId = currentUser.userId;
+			int productId = currentCart.productId;
+			int transactionQty = currentCart.productStock;
+			int couponId = 1;
+			String transactionType = "Credit"; //CHOOSE DEBIT OR CREDIT
+			Long transactionCardNumb = (long) 491673512; //INPUT CARD NUMBER
+			
+			if(currentCoupon != null) {
+				couponId = currentCoupon.couponId;
+			}
+			
+			String query = String.format(""
+					+"INSERT INTO transactions(userId, productId, couponId, transactionQty, transactionType, transactionCardNumber) VALUES "
+					+"(%d, %d, %d, %d, '%s', %d)", userId, productId, couponId, transactionQty, transactionType, transactionCardNumb);
+			con.executeUpdate(query);
+			return true;
+		}else {
+			System.out.println("cartnya kosong");
+			return false;
+		}
 		
-		return true;
 	}
 
 	
