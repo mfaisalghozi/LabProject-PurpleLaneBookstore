@@ -589,6 +589,7 @@ public class HomeView extends JFrame {
 			
 		
 		
+		
 		tHeadTransaction = new Vector<>();
 		tHeadTransaction.add("productId");
 		tHeadTransaction.add("transactionId");
