@@ -6,19 +6,29 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+
+import bookstore.controller.HomeController;
+
 import java.awt.Color;
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
+import java.util.Vector;
 import java.awt.event.ActionEvent;
 import java.awt.Panel;
 import java.awt.Label;
 import java.awt.Button;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
+
 import java.awt.Component;
 import javax.swing.JTextField;
 import java.awt.CardLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class AdminView extends JFrame {
 
@@ -31,7 +41,18 @@ public class AdminView extends JFrame {
 	private JTextField textField_4;
 	private Panel bookPanel;
 	private Panel searchPanel;
+	Vector<Object> tHeader;
+	Vector<Object> book;
+	private DefaultTableModel dtm;
+	JTable bookTable;
+	private HomeController home;
+	private static int userId;
+	private static String username;
+	private static String password;
 	
+	
+
+
 	/**
 	 * Launch the application.
 	 */
@@ -39,7 +60,7 @@ public class AdminView extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					AdminView frame = new AdminView();
+					AdminView frame = new AdminView(userId, username, password);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -47,11 +68,35 @@ public class AdminView extends JFrame {
 			}
 		});
 	}
-
+	
+	void getBook() {
+		book = null;
+		dtm = new DefaultTableModel(tHeader, 0);
+		book = home.getAllProducts();
+		Enumeration<Object> enu = book.elements();
+		while(enu.hasMoreElements()) {
+			dtm.addRow((Vector<?>) enu.nextElement());
+		}
+		bookTable.setModel(dtm);
+	}
+	
+	void fillBook() {
+		int idx = bookTable.getSelectedRow();
+//		String productName = 
+	}
+	
 	/**
 	 * Create the frame.
 	 */
-	public AdminView() {
+	public AdminView(int userId, String username, String password) {
+		this.userId = userId;
+		this.username = username;
+		this.password = password;
+		home = new HomeController(userId, username, password);
+		defaultView();
+	}
+	
+	void defaultView() {
 		setTitle("Admin BookStore PurpleLane");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 915, 537);
@@ -146,7 +191,22 @@ public class AdminView extends JFrame {
 		bookListPanel.setBounds(10, 40, 859, 354);
 		bookPanel.add(bookListPanel);
 		
-		JScrollPane sp = new JScrollPane((Component) null);
+		tHeader = new Vector<>();
+		tHeader.add("ProductId");
+		tHeader.add("ProductName");
+		tHeader.add("ProductAuthor");
+		tHeader.add("ProductPrice");
+		tHeader.add("ProductStock");
+		dtm = new DefaultTableModel(tHeader, 0);
+		bookListPanel.setLayout(null);
+		bookTable = new JTable(dtm);
+		bookTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+			}
+		});
+		
+		JScrollPane sp = new JScrollPane(bookTable);
 		sp.setBounds(0, 0, 859, 195);
 		bookListPanel.add(sp);
 		
@@ -223,5 +283,8 @@ public class AdminView extends JFrame {
 		lblProductStock.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblProductStock.setBounds(582, 14, 94, 17);
 		addToCartPanel.add(lblProductStock);
+		
+		getBook();
 	}
+	
 }

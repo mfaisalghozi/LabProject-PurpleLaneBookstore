@@ -97,7 +97,6 @@ public class HomeController {
 //		home.setVisible(true);
 //	}
 	
-
 	public String findIdx(int idx) {
 		currentSelected = products.get(idx);
 		return currentSelected.productName;
