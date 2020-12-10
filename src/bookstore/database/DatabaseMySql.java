@@ -16,6 +16,8 @@ public class DatabaseMySql {
 	private Statement st;
 	private static DatabaseMySql instance = null;
 	
+	
+	//Singleton Design Pattern
 	public static DatabaseMySql getInstance() {
 		return instance = instance == null ? new DatabaseMySql() : instance;
 	}

@@ -262,7 +262,7 @@ public class HomeView extends JFrame {
 		
 		JLabel logo1Lbl = new JLabel("PurpleLane");
 		logo1Lbl.setFont(new Font("Century", Font.ITALIC, 20));
-		logo1Lbl.setBounds(10, 0, 115, 50);
+		logo1Lbl.setBounds(10, 1, 115, 50);
 		menuPanel.add(logo1Lbl);
 		
 		JLabel logo2Lbl = new JLabel("Bookstore");
@@ -470,7 +470,17 @@ public class HomeView extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				//Create Transaction 
 				System.out.println(idCartChoose);
-					boolean transaction = home.createTransaction(idCartChoose);
+					String paymentType = null;
+					String[] option = new String[] {"Credit", "Debit"};
+					int response = JOptionPane.showOptionDialog(null, "Please Choose Your Payment Method ?", "Payment Type",
+					        JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+					        null, option, option[0]);
+					if(response==0){
+						paymentType = "Credit";
+					}else if(response==1){
+						paymentType = "Debit";
+					}
+					boolean transaction = home.createTransaction(idCartChoose, paymentType);
 					if(transaction == true) {
 						//if success checkout success
 						System.out.println("Checkout Success !");
@@ -479,8 +489,6 @@ public class HomeView extends JFrame {
 						System.out.println("Checkout Failed");
 						JOptionPane.showMessageDialog(btnCheckout, "Your cart is empty please fill cart first !");
 					}
-	
-				
 			}
 		});
 		btnCheckout.setBounds(174, 37, 125, 33);

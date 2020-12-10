@@ -230,7 +230,7 @@ public class HomeController {
 		
 	}
 
-	public boolean createTransaction(int idx) {
+	public boolean createTransaction(int idx, String paymentType) {
 		
 		//FLOW
 		//0. check if there is a product in cart, if no reject it
@@ -261,7 +261,7 @@ public class HomeController {
 			int productId = currentCart.productId;
 			int transactionQty = currentCart.productStock;
 			int couponId = 1;
-			String transactionType = "Credit"; //CHOOSE DEBIT OR CREDIT
+			String transactionType = paymentType; //CHOOSE DEBIT OR CREDIT
 			Long transactionCardNumb = (long) 491673512; //INPUT CARD NUMBER
 			
 			if(currentCoupon != null) {

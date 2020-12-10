@@ -128,7 +128,6 @@ public class AuthView extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				int dialogBtn = JOptionPane.YES_NO_OPTION;
 				int dialogResult = JOptionPane.showConfirmDialog(null, "Apakah yakin ingin logged out ?", "Peringatan", dialogBtn);
-				
 				if(dialogResult == 0) {
 					//True balik ke auth view
 					System.exit(0);
