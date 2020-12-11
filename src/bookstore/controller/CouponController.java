@@ -1,9 +1,13 @@
 package bookstore.controller;
 
-public class CouponController {
+import bookstore.database.DatabaseMySql;
 
+public class CouponController {
+	
+	DatabaseMySql con;
+	
 	public CouponController() {
-		// TODO Auto-generated constructor stub
+		con = DatabaseMySql.getInstance();
 	}
 	
 	void insertCoupon() {
