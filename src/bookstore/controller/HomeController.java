@@ -36,6 +36,7 @@ public class HomeController {
 	Product currentCart;
 	Coupon currentCoupon;
 	User currentUser;
+	Vector<Object> found;
 	
 	public Vector<Object> getAllTransaction(int userId) {
 		transResult = new Vector<Object>();
@@ -97,9 +98,16 @@ public class HomeController {
 //		home.setVisible(true);
 //	}
 	
-	public String findIdx(int idx) {
+	public Vector<Object> findIdx(int idx) {
+		found = new Vector<Object>();
 		currentSelected = products.get(idx);
-		return currentSelected.productName;
+		found.add(currentSelected.productName);
+		found.add(currentSelected.productId);
+		found.add(currentSelected.productStock);
+		found.add(currentSelected.productPrice);
+		found.add(currentSelected.productAuthor);
+		
+		return found;
 	}
 
 	public void addToCart(String productNameField, int productQty) {
@@ -237,20 +245,6 @@ public class HomeController {
 		//2. Create transaction by inserting to db all product in cart and create per collumn
 		//3. Deleting cart list, and refresh the page
 		//4. send success notification
-		
-//		public void insert() {
-//			Product pd = getData();
-//			String query = String.format("" 
-//					+ "INSERT INTO products VALUES " 
-//					+ "('%s', '%s', %d)", pd.productId, pd.productName, pd.productPrice);
-//			con.executeUpdate(query);
-//			getAllProducts();
-//		}
-		
-//		public String findIdx(int idx) {
-//			currentSelected = products.get(idx);
-//			return currentSelected.productName;
-//		}
 		
 		
 		if(carts.isEmpty() == false) {			

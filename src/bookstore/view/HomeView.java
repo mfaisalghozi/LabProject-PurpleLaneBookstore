@@ -55,6 +55,7 @@ public class HomeView extends JFrame {
 	private static String password;
 	private static int userId;
 	private HomeController home;
+	Vector<Object> foundProduct;
 	Vector<Object> tHeader;
 	Vector<Object> tHeadCoupon;
 	Vector<Object> tHeadTransaction;
@@ -73,6 +74,8 @@ public class HomeView extends JFrame {
 	private Panel transHistoryPanel;
 	private int idCartChoose;
 	private JTextField couponTextField;
+	
+	
 	/**
 	 * Launch the application.
 	 */
@@ -141,16 +144,16 @@ public class HomeView extends JFrame {
 		defaultView();
 	}
 	
-	void mainPanelAdmin() {
-		
-	};
+	void mainPanelAdmin() {	};
 	void mainPanelPromotionTeam() {};
 	void mainPanelManager() {};
 	
 	
 	void fillData() {
+		foundProduct = new Vector<Object>();
 		int idx = productTable.getSelectedRow();
-		String productName = home.findIdx(idx);
+		foundProduct = home.findIdx(idx);
+		String productName = (String) foundProduct.get(0);
 		productNameTextField.setText(productName);
 	}
 	

@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import bookstore.controller.BookController;
 import bookstore.controller.HomeController;
 
 import java.awt.Color;
@@ -16,6 +17,7 @@ import java.awt.Font;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Vector;
 import java.awt.event.ActionEvent;
 import java.awt.Panel;
@@ -29,26 +31,30 @@ import javax.swing.JTextField;
 import java.awt.CardLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigInteger;
 
 public class AdminView extends JFrame {
 
 	private JPanel bodyPanel;
 	private JPanel mainPanel;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField textField_4;
+	private JTextField productNameTxtField;
+	private JTextField productIdTxtField;
+	private JTextField productAuthorTxtField;
+	private JTextField productPriceTxtField;
+	private JTextField productStockTxtField;
 	private Panel bookPanel;
 	private Panel searchPanel;
+	Vector<Object> foundBook;
 	Vector<Object> tHeader;
 	Vector<Object> book;
+	Vector<String> bookFound;
 	private DefaultTableModel dtm;
 	JTable bookTable;
 	private HomeController home;
 	private static int userId;
 	private static String username;
 	private static String password;
+	private BookController bc;
 	
 	
 
@@ -82,8 +88,20 @@ public class AdminView extends JFrame {
 	
 	void fillBook() {
 		int idx = bookTable.getSelectedRow();
-//		String productName = 
+		foundBook = home.findIdx(idx);
+		int productId = (int) foundBook.get(1);
+		String productName = (String) foundBook.get(0);
+		String productAuthor = (String) foundBook.get(4);
+		BigInteger productPrice = (BigInteger) foundBook.get(3);
+		int productStock = (int) foundBook.get(2);
+		
+		productNameTxtField.setText(productName);
+		productIdTxtField.setText("" + productId);
+		productAuthorTxtField.setText(productAuthor);
+		productPriceTxtField.setText("" + productPrice);
+		productStockTxtField.setText("" + productStock);
 	}
+	
 	
 	/**
 	 * Create the frame.
@@ -93,13 +111,14 @@ public class AdminView extends JFrame {
 		this.username = username;
 		this.password = password;
 		home = new HomeController(userId, username, password);
+		bc = new BookController();
 		defaultView();
 	}
 	
 	void defaultView() {
 		setTitle("Admin BookStore PurpleLane");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 915, 537);
+		setBounds(100, 100, 919, 539);
 		bodyPanel = new JPanel();
 		bodyPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(bodyPanel);
@@ -203,6 +222,7 @@ public class AdminView extends JFrame {
 		bookTable.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
+				if(arg0.getSource() == bookTable) fillBook();
 			}
 		});
 		
@@ -217,14 +237,27 @@ public class AdminView extends JFrame {
 		bookListPanel.add(addToCartPanel);
 		
 		Button btnAddBook = new Button("Add New Book");
+		btnAddBook.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				int productId = Integer.parseInt(productIdTxtField.getText());
+				String productName = productNameTxtField.getText();
+				String productAuthor = productAuthorTxtField.getText();
+				int productPrice = Integer.parseInt(productPriceTxtField.getText());
+				int productStock = Integer.parseInt(productStockTxtField.getText());
+				
+				bc.insertBook(productId, productName, productAuthor, productPrice, productStock);
+				getBook();
+			}
+		});
 		btnAddBook.setActionCommand("Add New Book");
 		btnAddBook.setBounds(191, 98, 125, 33);
 		addToCartPanel.add(btnAddBook);
 		
-		textField = new JTextField();
-		textField.setColumns(10);
-		textField.setBounds(114, 11, 167, 20);
-		addToCartPanel.add(textField);
+		productNameTxtField = new JTextField();
+		productNameTxtField.setColumns(10);
+		productNameTxtField.setBounds(114, 11, 167, 20);
+		addToCartPanel.add(productNameTxtField);
 		
 		JLabel productNameLbl = new JLabel("Product Name");
 		productNameLbl.setForeground(Color.WHITE);
@@ -232,29 +265,51 @@ public class AdminView extends JFrame {
 		productNameLbl.setBounds(10, 14, 94, 17);
 		addToCartPanel.add(productNameLbl);
 		
-		JLabel productQtyLbl = new JLabel("Quantity");
-		productQtyLbl.setForeground(Color.WHITE);
-		productQtyLbl.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		productQtyLbl.setBounds(10, 42, 72, 17);
-		addToCartPanel.add(productQtyLbl);
+		JLabel productIdLbl = new JLabel("Product ID");
+		productIdLbl.setForeground(Color.WHITE);
+		productIdLbl.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		productIdLbl.setBounds(10, 42, 72, 17);
+		addToCartPanel.add(productIdLbl);
 		
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
-		textField_1.setBounds(114, 42, 167, 20);
-		addToCartPanel.add(textField_1);
+		productIdTxtField = new JTextField();
+		productIdTxtField.setColumns(10);
+		productIdTxtField.setBounds(114, 42, 167, 20);
+		addToCartPanel.add(productIdTxtField);
 		
 		Button btnUpdateBook = new Button("Update Book");
+		btnUpdateBook.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int productId = Integer.parseInt(productIdTxtField.getText());
+				String productName = productNameTxtField.getText();
+				String productAuthor = productAuthorTxtField.getText();
+				int productPrice = Integer.parseInt(productPriceTxtField.getText());
+				int productStock = Integer.parseInt(productStockTxtField.getText());
+								
+				bc.updateBook(productId, productName, productAuthor, productPrice, productStock);
+				getBook();
+			}
+		});
 		btnUpdateBook.setBounds(377, 98, 125, 33);
 		addToCartPanel.add(btnUpdateBook);
 		
 		Button btnDeleteBook = new Button("Delete Book");
+		btnDeleteBook.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int productId = Integer.parseInt(productIdTxtField.getText());
+								
+				bc.deleteBook(productId);
+				getBook();
+			}
+		});
 		btnDeleteBook.setBounds(570, 98, 125, 33);
 		addToCartPanel.add(btnDeleteBook);
 		
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
-		textField_2.setBounds(405, 11, 167, 20);
-		addToCartPanel.add(textField_2);
+		productAuthorTxtField = new JTextField();
+		productAuthorTxtField.setColumns(10);
+		productAuthorTxtField.setBounds(405, 11, 167, 20);
+		addToCartPanel.add(productAuthorTxtField);
 		
 		JLabel lblProductAuthor = new JLabel("Product Author");
 		lblProductAuthor.setForeground(Color.WHITE);
@@ -262,10 +317,10 @@ public class AdminView extends JFrame {
 		lblProductAuthor.setBounds(301, 14, 94, 17);
 		addToCartPanel.add(lblProductAuthor);
 		
-		textField_3 = new JTextField();
-		textField_3.setColumns(10);
-		textField_3.setBounds(405, 42, 167, 20);
-		addToCartPanel.add(textField_3);
+		productPriceTxtField = new JTextField();
+		productPriceTxtField.setColumns(10);
+		productPriceTxtField.setBounds(405, 42, 167, 20);
+		addToCartPanel.add(productPriceTxtField);
 		
 		JLabel lblProductPrice = new JLabel("Product Price");
 		lblProductPrice.setForeground(Color.WHITE);
@@ -273,10 +328,10 @@ public class AdminView extends JFrame {
 		lblProductPrice.setBounds(301, 45, 94, 17);
 		addToCartPanel.add(lblProductPrice);
 		
-		textField_4 = new JTextField();
-		textField_4.setColumns(10);
-		textField_4.setBounds(686, 11, 167, 20);
-		addToCartPanel.add(textField_4);
+		productStockTxtField = new JTextField();
+		productStockTxtField.setColumns(10);
+		productStockTxtField.setBounds(686, 11, 167, 20);
+		addToCartPanel.add(productStockTxtField);
 		
 		JLabel lblProductStock = new JLabel("Product Stock");
 		lblProductStock.setForeground(Color.WHITE);
