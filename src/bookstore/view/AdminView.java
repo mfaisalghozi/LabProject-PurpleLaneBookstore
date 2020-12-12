@@ -88,7 +88,7 @@ public class AdminView extends JFrame {
 	
 	void fillBook() {
 		int idx = bookTable.getSelectedRow();
-		foundBook = home.findIdx(idx);
+		foundBook = home.findProduct(idx);
 		int productId = (int) foundBook.get(1);
 		String productName = (String) foundBook.get(0);
 		String productAuthor = (String) foundBook.get(4);

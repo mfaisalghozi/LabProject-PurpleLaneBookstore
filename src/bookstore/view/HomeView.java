@@ -152,7 +152,7 @@ public class HomeView extends JFrame {
 	void fillData() {
 		foundProduct = new Vector<Object>();
 		int idx = productTable.getSelectedRow();
-		foundProduct = home.findIdx(idx);
+		foundProduct = home.findProduct(idx);
 		String productName = (String) foundProduct.get(0);
 		productNameTextField.setText(productName);
 	}

@@ -26,17 +26,20 @@ public class HomeController {
 	private HomeView view;
 	DatabaseMySql con;
 	Vector<Product> products = new Vector<Product>();
+	Vector<Coupon> coupons = new Vector<Coupon>();
 	Vector<Object> result;
 	Vector<Transaction> trans = new Vector<Transaction>();
 	Vector<Object> transResult;
 	Vector<Object> coupon;
 	Vector<Product> cartCheckout = new Vector<Product>();
 	Vector<Object> carts = new Vector<Object>();
+	Vector<Object> foundCoupon;
 	Product currentSelected;
 	Product currentCart;
+	Coupon findCoupon;
 	Coupon currentCoupon;
 	User currentUser;
-	Vector<Object> found;
+	Vector<Object> foundProduct;
 	
 	public Vector<Object> getAllTransaction(int userId) {
 		transResult = new Vector<Object>();
@@ -98,17 +101,29 @@ public class HomeController {
 //		home.setVisible(true);
 //	}
 	
-	public Vector<Object> findIdx(int idx) {
-		found = new Vector<Object>();
+	public Vector<Object> findProduct(int idx) {
+		foundProduct = new Vector<Object>();
 		currentSelected = products.get(idx);
-		found.add(currentSelected.productName);
-		found.add(currentSelected.productId);
-		found.add(currentSelected.productStock);
-		found.add(currentSelected.productPrice);
-		found.add(currentSelected.productAuthor);
+		foundProduct.add(currentSelected.productName);
+		foundProduct.add(currentSelected.productId);
+		foundProduct.add(currentSelected.productStock);
+		foundProduct.add(currentSelected.productPrice);
+		foundProduct.add(currentSelected.productAuthor);
 		
-		return found;
+		return foundProduct;
 	}
+	
+	public Vector<Object> findCoupon(int idx){
+		foundCoupon = new Vector<Object>();
+		findCoupon = coupons.get(idx);
+		foundCoupon.add(findCoupon.couponId);
+		foundCoupon.add(findCoupon.couponCode);
+		foundCoupon.add(findCoupon.couponDiscount);
+		foundCoupon.add(findCoupon.couponNote);
+		
+		return foundCoupon;
+	}
+	
 
 	public void addToCart(String productNameField, int productQty) {
 		ResultSet rs = con.executeQuery("SELECT * FROM `products` WHERE `productName` LIKE '"+productNameField+"'");
@@ -187,7 +202,8 @@ public class HomeController {
 				Long couponDiscount = (Long) rs.getObject(3);
 				String couponNote = (String) rs.getObject(4);
 				
-				Coupon cp = new Coupon(couponId, couponCode, couponDiscount, couponNote); 
+				Coupon cp = new Coupon(couponId, couponCode, couponDiscount, couponNote);
+				coupons.add(cp);
 				coupon.add(cp.toObjects());
 			}
 			return coupon;

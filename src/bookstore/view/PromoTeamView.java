@@ -6,6 +6,12 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+
+import bookstore.controller.BookController;
+import bookstore.controller.CouponController;
+import bookstore.controller.HomeController;
+
 import java.awt.Color;
 import javax.swing.JLabel;
 import java.awt.Font;
@@ -14,11 +20,18 @@ import java.awt.CardLayout;
 import java.awt.Panel;
 import java.awt.Label;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
+
 import java.awt.Component;
 import java.awt.Button;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
+import java.math.BigInteger;
+import java.util.Enumeration;
+import java.util.Vector;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class PromoTeamView extends JFrame {
 
@@ -26,11 +39,17 @@ public class PromoTeamView extends JFrame {
 	private HomeController home;
 	private JPanel contentPane;
 	private JTextField couponCodeField;
-	private JTextField textField_1;
+	private JTextField couponIdTxtField;
 	private JTextField couponDiscounTxtField;
 	private JTextField couponNoteTxtField;
+	private DefaultTableModel dtm;
+	private JTable couponTable;
 	Vector<Object> tHeader;
 	Vector<Object> coupon;
+	Vector<Object> foundCoupon;
+	private static int userId;
+	private static String username;
+	private static String password;
 	
 	
 	
@@ -41,7 +60,7 @@ public class PromoTeamView extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					PromoTeamView frame = new PromoTeamView();
+					PromoTeamView frame = new PromoTeamView(userId, username, password);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -52,18 +71,46 @@ public class PromoTeamView extends JFrame {
 	
 //	Get Coupon Information from controller
 	void getCoupon() {
-		
+		coupon = null;
+		dtm = new DefaultTableModel(tHeader, 0);
+		coupon = home.getAllCoupon();
+		Enumeration<Object> n = coupon.elements();
+		while(n.hasMoreElements()) {
+			dtm.addRow((Vector<?>) n.nextElement());
+		}
+		couponTable.setModel(dtm);
 	}
 	
 //	Fill coupon textField from selected row at table
 	void fillCoupon() {
+		int idx = couponTable.getSelectedRow();
+		foundCoupon = home.findCoupon(idx);
+		int couponId = (int) foundCoupon.get(0);
+		String couponCode = (String) foundCoupon.get(1);
+		Long couponDiscount = (Long) foundCoupon.get(2);
+		String couponNote = (String) foundCoupon.get(3);
 		
+		couponCodeField.setText(couponCode);
+		couponIdTxtField.setText("" + couponId);
+		couponDiscounTxtField.setText("" + couponDiscount);
+		couponNoteTxtField.setText(couponNote);
 	}
 
 	/**
 	 * Create the frame.
 	 */
-	public PromoTeamView() {
+	public PromoTeamView(int userId, String username, String password) {
+		this.userId = userId;
+		this.username = username;
+		this.password = password;
+		home = new HomeController(userId, username, password);
+		cpn = new CouponController();
+		defaultView();
+//		Get All Information From DB
+		getCoupon();
+	}
+	
+	void defaultView() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 915, 536);
 		contentPane = new JPanel();
@@ -115,7 +162,22 @@ public class PromoTeamView extends JFrame {
 		couponListPanel.setBounds(10, 40, 859, 354);
 		couponPanel.add(couponListPanel);
 		
-		JScrollPane sp = new JScrollPane((Component) null);
+		
+		tHeader = new Vector<Object>();
+		tHeader.add("Coupon ID");
+		tHeader.add("Coupon Code");
+		tHeader.add("Coupon Discount");
+		tHeader.add("Coupon Note");
+		dtm = new DefaultTableModel(tHeader, 0);
+		couponTable = new JTable(dtm);
+		couponTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if(arg0.getSource() == couponTable) fillCoupon();
+			}
+		});
+		
+		JScrollPane sp = new JScrollPane(couponTable);
 		sp.setBounds(0, 0, 859, 195);
 		couponListPanel.add(sp);
 		
@@ -126,6 +188,18 @@ public class PromoTeamView extends JFrame {
 		couponListPanel.add(couponSettingPanel);
 		
 		Button btnAddCoupon = new Button("Add Coupon");
+		btnAddCoupon.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int couponId = Integer.parseInt(couponIdTxtField.getText());
+				String couponCode = couponCodeField.getText();
+				String couponNote = couponNoteTxtField.getText();
+				Long couponDiscount = Long.parseLong(couponDiscounTxtField.getText());
+				
+				cpn.insertCoupon(couponId, couponCode, couponDiscount, couponNote);
+				getCoupon();
+			}
+		});
 		btnAddCoupon.setActionCommand("Add Coupon");
 		btnAddCoupon.setBounds(191, 98, 125, 33);
 		couponSettingPanel.add(btnAddCoupon);
@@ -147,20 +221,36 @@ public class PromoTeamView extends JFrame {
 		couponIdLbl.setBounds(104, 42, 72, 17);
 		couponSettingPanel.add(couponIdLbl);
 		
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
-		textField_1.setBounds(208, 42, 167, 20);
-		couponSettingPanel.add(textField_1);
+		couponIdTxtField = new JTextField();
+		couponIdTxtField.setColumns(10);
+		couponIdTxtField.setBounds(208, 42, 167, 20);
+		couponSettingPanel.add(couponIdTxtField);
 		
 		Button btnUpdateCoupon = new Button("Update Coupon");
 		btnUpdateCoupon.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				int couponId = Integer.parseInt(couponIdTxtField.getText());
+				String couponCode = couponCodeField.getText();
+				String couponNote = couponNoteTxtField.getText();
+				Long couponDiscount = Long.parseLong(couponDiscounTxtField.getText());
+				
+				cpn.updateCoupon(couponId, couponCode, couponDiscount, couponNote);
+				getCoupon();
 			}
 		});
 		btnUpdateCoupon.setBounds(377, 98, 125, 33);
 		couponSettingPanel.add(btnUpdateCoupon);
 		
 		Button btnDeleteCoupon = new Button("Delete Coupon");
+		btnDeleteCoupon.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int couponId = Integer.parseInt(couponIdTxtField.getText());
+				
+				cpn.deleteCoupon(couponId);
+				getCoupon();
+			}
+		});
 		btnDeleteCoupon.setBounds(570, 98, 125, 33);
 		couponSettingPanel.add(btnDeleteCoupon);
 		
