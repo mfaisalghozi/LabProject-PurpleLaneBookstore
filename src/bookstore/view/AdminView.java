@@ -160,6 +160,7 @@ public class AdminView extends JFrame {
 		JButton btnSearchMenu = new JButton("Search Book");
 		btnSearchMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				//remove Panel
 				mainPanel.removeAll();
 				mainPanel.repaint();
 				mainPanel.revalidate();
