@@ -43,7 +43,10 @@ public class ManagerView extends JFrame {
 	private Vector<Object> headerTransaction;
 	private Vector<Object> headerUser;
 	private Vector<Object> trans;
+	private Vector<Object> user;
+	private DefaultTableModel utm;
 	private DefaultTableModel dtm;
+	private JTable userTable;
 	private JTable financialTable;
 	private Panel financialPanel;
 	private Panel staffPanel;
@@ -64,7 +67,7 @@ public class ManagerView extends JFrame {
 		});
 	}
 	
-	public void getTransaction() {
+	void getTransaction() {
 		trans = null;
 		dtm = new DefaultTableModel(headerTransaction, 0);
 		trans = tc.getAllTransaction();
@@ -73,6 +76,17 @@ public class ManagerView extends JFrame {
 			dtm.addRow((Vector<?>) n.nextElement());
 		}
 		financialTable.setModel(dtm);
+	}
+	
+	void getUser() {
+		user = null;
+		utm = new DefaultTableModel(headerUser, 0);
+		user = uc.getAllUser();
+		Enumeration<Object> n = user.elements();
+		while(n.hasMoreElements()) {
+			utm.addRow((Vector<?>) n.nextElement());
+		}
+		userTable.setModel(utm);
 	}
 	
 	
@@ -84,6 +98,7 @@ public class ManagerView extends JFrame {
 		uc = new UserController();
 		defaultView();
 		getTransaction();
+		getUser();
 	}
 	
 	void defaultView() {
@@ -194,7 +209,15 @@ public class ManagerView extends JFrame {
 		staffListPanel.setBounds(10, 40, 859, 325);
 		staffPanel.add(staffListPanel);
 		
-		JScrollPane sp_user = new JScrollPane((Component) null);
+		headerUser = new Vector<>();
+		headerUser.add("User ID");
+		headerUser.add("User Name");
+		headerUser.add("User Password");
+		headerUser.add("User Role ID");
+		utm = new DefaultTableModel(headerUser, 0);
+		userTable = new JTable(utm);
+		
+		JScrollPane sp_user = new JScrollPane(userTable);
 		sp_user.setBounds(0, 0, 859, 195);
 		staffListPanel.add(sp_user);
 		
