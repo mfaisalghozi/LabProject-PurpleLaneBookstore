@@ -454,6 +454,7 @@ public class HomeView extends JFrame {
 				if(delete == true) {
 					JOptionPane.showMessageDialog(btnDeleteItem, "Delete item from cart success !");
 					cartTextField.setText("");
+					cardNumberTxtField.setText("");
 					getCart();
 				}else {
 					JOptionPane.showMessageDialog(btnDeleteItem, "No Item right there :(");
