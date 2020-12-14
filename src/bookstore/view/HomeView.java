@@ -74,6 +74,7 @@ public class HomeView extends JFrame {
 	private Panel transHistoryPanel;
 	private int idCartChoose;
 	private JTextField couponTextField;
+	private JTextField cardNumberTxtField;
 	
 	
 	/**
@@ -443,7 +444,7 @@ public class HomeView extends JFrame {
 		Panel deleteItemPanel = new Panel();
 		deleteItemPanel.setLayout(null);
 		deleteItemPanel.setBackground(Color.GRAY);
-		deleteItemPanel.setBounds(0, 297, 620, 98);
+		deleteItemPanel.setBounds(0, 282, 620, 113);
 		cartListPanel.add(deleteItemPanel);
 		
 		Button btnDeleteItem = new Button("Delete Item");
@@ -460,45 +461,72 @@ public class HomeView extends JFrame {
 				
 			}
 		});
-		btnDeleteItem.setBounds(325, 37, 125, 33);
+		btnDeleteItem.setBounds(326, 55, 118, 33);
 		deleteItemPanel.add(btnDeleteItem);
 		
 		cartTextField = new JTextField();
 		cartTextField.setColumns(10);
-		cartTextField.setBounds(215, 11, 192, 20);
+		cartTextField.setBounds(139, 12, 130, 20);
 		deleteItemPanel.add(cartTextField);
 		
 		Button btnCheckout = new Button("Checkout");
 		btnCheckout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//Create Transaction 
-				System.out.println(idCartChoose);
-					String paymentType = null;
-					String[] option = new String[] {"Credit", "Debit"};
-					int response = JOptionPane.showOptionDialog(null, "Please Choose Your Payment Method ?", "Payment Type",
-					        JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
-					        null, option, option[0]);
-					if(response==0){
-						paymentType = "Credit";
-					}else if(response==1){
-						paymentType = "Debit";
-					}
-					boolean transaction = home.createTransaction(idCartChoose, paymentType);
-					if(transaction == true) {
-						//if success checkout success
-						System.out.println("Checkout Success !");
-						JOptionPane.showMessageDialog(btnCheckout, "Checkout Success ! Happy Shopping !");
-						boolean delete = home.deleteCart(idCartChoose);
-						getCart();
-					}else {
-						System.out.println("Checkout Failed");
-						JOptionPane.showMessageDialog(btnCheckout, "Your cart is empty please fill cart first !");
-					}
-					getTransaction();
+				//GET CARD NUMBER
+				String numb = cardNumberTxtField.getText();
+				if(numb.equals("")) {
+					JOptionPane.showMessageDialog(btnCheckout, "NOMOR KARTU TIDAK BOLEH KOSONG !");
+				}else {
+					Long cardNumber = Long.parseLong(cardNumberTxtField.getText());
+					//Create Transaction 
+					System.out.println(idCartChoose);
+						String paymentType = null;
+						String[] option = new String[] {"Credit", "Debit"};
+						int response = JOptionPane.showOptionDialog(null, "Please Choose Your Payment Method ?", "Payment Type",
+						        JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+						        null, option, option[0]);
+						if(response==0){
+							paymentType = "Credit";
+						}else if(response==1){
+							paymentType = "Debit";
+						}
+						boolean transaction = home.createTransaction(idCartChoose, paymentType, cardNumber);
+						if(transaction == true) {
+							//if success checkout success
+							System.out.println("Checkout Success !");
+							JOptionPane.showMessageDialog(btnCheckout, "Checkout Success ! Happy Shopping !");
+							cartTextField.setText("");
+							cardNumberTxtField.setText("");
+							boolean delete = home.deleteCart(idCartChoose);
+							getCart();
+						}else {
+							System.out.println("Checkout Failed");
+							JOptionPane.showMessageDialog(btnCheckout, "Your cart is empty please fill cart first !");
+						}
+						getTransaction();
+					
+					
+				}
+			
 			}
 		});
-		btnCheckout.setBounds(174, 37, 125, 33);
+		btnCheckout.setBounds(174, 55, 125, 33);
 		deleteItemPanel.add(btnCheckout);
+		
+		JLabel lblProductName = new JLabel("Product Name");
+		lblProductName.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		lblProductName.setBounds(42, 11, 87, 20);
+		deleteItemPanel.add(lblProductName);
+		
+		cardNumberTxtField = new JTextField();
+		cardNumberTxtField.setColumns(10);
+		cardNumberTxtField.setBounds(397, 11, 174, 20);
+		deleteItemPanel.add(cardNumberTxtField);
+		
+		JLabel lblCardNumber = new JLabel("Card Number");
+		lblCardNumber.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		lblCardNumber.setBounds(300, 11, 87, 20);
+		deleteItemPanel.add(lblCardNumber);
 		
 		jtm = new DefaultTableModel(tHeader, 0);
 		cartTable = new JTable(dtm);
@@ -511,7 +539,7 @@ public class HomeView extends JFrame {
 		
 		
 		JScrollPane sp_cart = new JScrollPane(cartTable);
-		sp_cart.setBounds(0, 0, 620, 298);
+		sp_cart.setBounds(0, 0, 620, 283);
 		cartListPanel.add(sp_cart);
 		
 		tHeadCoupon = new Vector<>();

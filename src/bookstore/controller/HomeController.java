@@ -25,10 +25,10 @@ public class HomeController {
 //	private User model;
 	private HomeView view;
 	DatabaseMySql con;
-	Vector<Product> products = new Vector<Product>();
-	Vector<Coupon> coupons = new Vector<Coupon>();
+	Vector<Product> products;
+	Vector<Coupon> coupons;
 	Vector<Object> result;
-	Vector<Transaction> trans = new Vector<Transaction>();
+	Vector<Transaction> trans;
 	Vector<Object> transResult;
 	Vector<Object> coupon;
 	Vector<Product> cartCheckout = new Vector<Product>();
@@ -43,6 +43,7 @@ public class HomeController {
 	
 	public Vector<Object> getAllTransaction(int userId) {
 		transResult = new Vector<Object>();
+		trans = new Vector<Transaction>();
 		ResultSet rs = con.executeQuery("SELECT * FROM transactions WHERE userId = " + userId);
 		try {
 			while(rs.next()) {
@@ -66,6 +67,7 @@ public class HomeController {
 	
 	public Vector<Object> getAllProducts(){
 		result = new Vector<Object>();
+		products = new Vector<Product>();
 		ResultSet rs = con.executeQuery("SELECT * FROM products");
 		try {
 			while(rs.next()) {
@@ -194,6 +196,7 @@ public class HomeController {
 
 	public Vector<Object> getAllCoupon() {
 		coupon = new Vector<Object>();
+		coupons = new Vector<Coupon>();
 		ResultSet rs = con.executeQuery("SELECT * FROM coupons");
 		try {
 			while(rs.next()) {
@@ -253,7 +256,7 @@ public class HomeController {
 		
 	}
 
-	public boolean createTransaction(int idx, String paymentType) {
+	public boolean createTransaction(int idx, String paymentType, long cardNumber) {
 		
 		//FLOW
 		//0. check if there is a product in cart, if no reject it
@@ -271,7 +274,7 @@ public class HomeController {
 			int transactionQty = currentCart.productStock;
 			int couponId = 1;
 			String transactionType = paymentType; //CHOOSE DEBIT OR CREDIT
-			Long transactionCardNumb = (long) 491673512; //INPUT CARD NUMBER
+			Long transactionCardNumb = cardNumber; //INPUT CARD NUMBER
 			
 			if(currentCoupon != null) {
 				couponId = currentCoupon.couponId;
