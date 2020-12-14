@@ -5,7 +5,7 @@ import java.util.Vector;
 public class User {
 	
 	public int userId;
-	private int roleId;
+	public int roleId;
 	public String username;
 	public String password;
 	

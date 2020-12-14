@@ -13,8 +13,6 @@ public class AuthController {
 		con = DatabaseMySql.getInstance();
 	}
 	
-	
-	
 	public boolean Login(String loginUsername, String loginPassword) {
 		try {
 			String sql = "SELECT * FROM `users` WHERE `userName` LIKE '"+loginUsername+"' AND `userPassword` LIKE '"+loginPassword+"'";		

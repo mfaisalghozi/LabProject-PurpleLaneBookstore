@@ -251,8 +251,17 @@ public class AuthView extends JFrame {
 					//else if userRoleId == 2 => promotionHomeView()
 					//else if userRoleId == 3 => managerHomeView()
 					//else => HomeView()
-	
-					if(roleId == 4) {
+					
+					if(roleId == 1) {
+						AdminView n = new AdminView(userId, loginUsername, loginPassword);
+						n.setVisible(true);
+					}else if(roleId == 2) {
+						PromoTeamView n = new PromoTeamView(userId, loginUsername,loginPassword);
+						n.setVisible(true);
+					}else if(roleId == 3) {
+						ManagerView n = new ManagerView();
+						n.setVisible(true);
+					}else if(roleId == 4) {
 						HomeView n = new HomeView(userId,loginUsername, loginPassword);
 						n.setVisible(true);
 					}

@@ -488,10 +488,13 @@ public class HomeView extends JFrame {
 						//if success checkout success
 						System.out.println("Checkout Success !");
 						JOptionPane.showMessageDialog(btnCheckout, "Checkout Success ! Happy Shopping !");
+						boolean delete = home.deleteCart(idCartChoose);
+						getCart();
 					}else {
 						System.out.println("Checkout Failed");
 						JOptionPane.showMessageDialog(btnCheckout, "Your cart is empty please fill cart first !");
 					}
+					getTransaction();
 			}
 		});
 		btnCheckout.setBounds(174, 37, 125, 33);

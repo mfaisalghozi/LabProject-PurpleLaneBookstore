@@ -52,7 +52,6 @@ public class PromoTeamView extends JFrame {
 	private static String password;
 	
 	
-	
 	/**
 	 * Launch the application.
 	 */
@@ -100,6 +99,7 @@ public class PromoTeamView extends JFrame {
 	 * Create the frame.
 	 */
 	public PromoTeamView(int userId, String username, String password) {
+		setTitle("Promo Team PurpleLane Bookstore");
 		this.userId = userId;
 		this.username = username;
 		this.password = password;

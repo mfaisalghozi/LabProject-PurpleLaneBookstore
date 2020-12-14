@@ -44,12 +44,14 @@ public class ManagerView extends JFrame {
 	private Vector<Object> headerUser;
 	private Vector<Object> trans;
 	private Vector<Object> user;
+	private Vector<Object> foundUser;
 	private DefaultTableModel utm;
 	private DefaultTableModel dtm;
 	private JTable userTable;
 	private JTable financialTable;
 	private Panel financialPanel;
 	private Panel staffPanel;
+	private JTextField passwordTxtField;
 
 	/**
 	 * Launch the application.
@@ -89,11 +91,26 @@ public class ManagerView extends JFrame {
 		userTable.setModel(utm);
 	}
 	
+	void fillUser() {
+		int idx = userTable.getSelectedRow();
+		foundUser = uc.foundUser(idx);
+		int userId = (int) foundUser.get(0);
+		String username = (String) foundUser.get(1);
+		String password = (String) foundUser.get(2);
+		int userRoleId = (int) foundUser.get(3);
+		
+		 userIdTxtField.setText("" + userId);
+		 userRoleIdTxtField.setText("" + userRoleId);
+		 usernameTxtField.setText(username);
+		 passwordTxtField.setText(password);
+	}
+	
 	
 	/**
 	 * Create the frame.
 	 */
 	public ManagerView() {
+		setTitle("Manager PurpleLane Bookstore");
 		tc = new TransactionController();
 		uc = new UserController();
 		defaultView();
@@ -216,6 +233,12 @@ public class ManagerView extends JFrame {
 		headerUser.add("User Role ID");
 		utm = new DefaultTableModel(headerUser, 0);
 		userTable = new JTable(utm);
+		userTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+			if(arg0.getSource() == userTable) fillUser();
+			}
+		});
 		
 		JScrollPane sp_user = new JScrollPane(userTable);
 		sp_user.setBounds(0, 0, 859, 195);
@@ -227,10 +250,21 @@ public class ManagerView extends JFrame {
 		staffSetttingPanel.setBounds(0, 195, 859, 138);
 		staffListPanel.add(staffSetttingPanel);
 		
-		Button btnAddBook_1 = new Button("Add Staff");
-		btnAddBook_1.setActionCommand("Add New Book");
-		btnAddBook_1.setBounds(193, 84, 125, 33);
-		staffSetttingPanel.add(btnAddBook_1);
+		Button btnAddStaff = new Button("Add Staff");
+		btnAddStaff.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {				
+				int userId = Integer.parseInt(userIdTxtField.getText());
+				int roleId = Integer.parseInt(userRoleIdTxtField.getText());
+				String username = usernameTxtField.getText();
+				String password = passwordTxtField.getText();
+				
+				uc.addStaff(userId, roleId, username, password);
+				getUser();
+			}
+		});
+		btnAddStaff.setActionCommand("Add New Book");
+		btnAddStaff.setBounds(193, 84, 125, 33);
+		staffSetttingPanel.add(btnAddStaff);
 		
 		userIdTxtField = new JTextField();
 		userIdTxtField.setColumns(10);
@@ -254,13 +288,32 @@ public class ManagerView extends JFrame {
 		userRoleIdTxtField.setBounds(256, 42, 167, 20);
 		staffSetttingPanel.add(userRoleIdTxtField);
 		
-		Button btnUpdateBook_1 = new Button("Update User");
-		btnUpdateBook_1.setBounds(377, 84, 125, 33);
-		staffSetttingPanel.add(btnUpdateBook_1);
+		Button btnUpdateStaff = new Button("Update User");
+		btnUpdateStaff.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int userId = Integer.parseInt(userIdTxtField.getText());
+				int roleId = Integer.parseInt(userRoleIdTxtField.getText());
+				String username = usernameTxtField.getText();
+				String password = passwordTxtField.getText();
+				
+				uc.updateStaff(userId, roleId, username, password);
+				getUser();
+			}
+		});
+		btnUpdateStaff.setBounds(377, 84, 125, 33);
+		staffSetttingPanel.add(btnUpdateStaff);
 		
-		Button btnDeleteBook_1 = new Button("Delete Staff");
-		btnDeleteBook_1.setBounds(570, 84, 125, 33);
-		staffSetttingPanel.add(btnDeleteBook_1);
+		Button btnDeleteStaff = new Button("Delete Staff");
+		btnDeleteStaff.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int userId = Integer.parseInt(userIdTxtField.getText());
+				
+				uc.deleteStaff(userId);
+				getUser();
+			}
+		});
+		btnDeleteStaff.setBounds(570, 84, 125, 33);
+		staffSetttingPanel.add(btnDeleteStaff);
 		
 		usernameTxtField = new JTextField();
 		usernameTxtField.setColumns(10);
@@ -272,6 +325,16 @@ public class ManagerView extends JFrame {
 		lblProductStock_1.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblProductStock_1.setBounds(454, 14, 94, 17);
 		staffSetttingPanel.add(lblProductStock_1);
+		
+		passwordTxtField = new JTextField();
+		passwordTxtField.setColumns(10);
+		passwordTxtField.setBounds(558, 43, 167, 20);
+		staffSetttingPanel.add(passwordTxtField);
+		
+		JLabel lblProductStock_1_1 = new JLabel("Password");
+		lblProductStock_1_1.setForeground(Color.WHITE);
+		lblProductStock_1_1.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		lblProductStock_1_1.setBounds(454, 46, 94, 17);
+		staffSetttingPanel.add(lblProductStock_1_1);
 	}
-	
 }

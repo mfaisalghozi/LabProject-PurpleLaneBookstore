@@ -4,15 +4,9 @@ import bookstore.view.HomeView;
 
 public class Main {
 
-	public Main() {
-//		HomeView home = new HomeView();
-//		home.setVisible(true);
-		
+	public Main() {		
 		AuthView auth = new AuthView();
 		auth.setVisible(true);
-		
-		
-//		DatabaseMySql n = new DatabaseMySql();
 	}
 
 	public static void main(String[] args) {
